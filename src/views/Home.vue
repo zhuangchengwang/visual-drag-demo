@@ -124,12 +124,13 @@ export default {
 
         deselectCurComponent(e) {
             // console.log(e);
-            if(e.target.className==='mark-line'){
+            //加上这个if是因为(先前为了使用layuitab可以被点击切换,允许事件冒泡,结果导致,组件选中后马上被取消,因为冒泡会到这里来)
+            //然而,也因此导致了一个问题:右键菜单置顶置地功能无法及时响应,因为要想及时响应就必须取消选中
+            if(e.target.className==='mark-line'||e.target.className==='lic'){
+
                this.$store.commit('setCurComponent', { component: null, index: null })
-               this.$store.commit('hideContexeMenu')
-            }else{
-                console.log("点击来源不匹配,不操作!"+e.target.className);
             }
+            this.$store.commit('hideContexeMenu')
         },
     },
 }
@@ -172,9 +173,9 @@ export default {
             .content {
                 height: 100%;
                 overflow: auto;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                // display: flex;
+                // align-items: center;
+                // justify-content: center;
             }
         }
     }

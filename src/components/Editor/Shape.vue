@@ -2,7 +2,7 @@
 <template>
     <div class="shape" :class="{ active: this.active }" @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
         <!-- 暂时关闭旋转 -->
-        <!-- <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i> -->
+        <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i>
         <div
             class="shape-point"
             v-for="(item, index) in (active? pointList : [])"
@@ -186,7 +186,7 @@ export default {
             if (this.element.component != 'v-text') {
                 e.preventDefault()
             }
-            console.log("handleMouseDownOnShape",e);
+            // console.log("handleMouseDownOnShape",e);
             // e.stopPropagation()
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
@@ -346,7 +346,7 @@ export default {
                     x: curX - editorRectInfo.left,
                     y: curY - editorRectInfo.top,
                 }
-                console.log("curPositon:",curPositon)
+                // console.log("curPositon:",curPositon)
                 calculateComponentPositonAndSize(point, style, curPositon, {
                     center,
                     curPoint,
@@ -363,13 +363,15 @@ export default {
                     // 后面两个参数代表鼠标移动方向
                     // curY - startY > 0 true 表示向下移动 false 表示向上移动
                     // curX - startX > 0 true 表示向右移动 false 表示向左移动
-                    eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
+                    // eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
+                    eventBus.$emit('resize', curY - startY > 0, curX - startX > 0)
                 })
             }
 
             const up = () => {
                 document.removeEventListener('mousemove', move)
-                eventBus.$emit('unmove')
+                // eventBus.$emit('unmove')
+                eventBus.$emit('unresize')
                 document.removeEventListener('mouseup', up)
                 needSave && this.$store.commit('recordSnapshot')
             }

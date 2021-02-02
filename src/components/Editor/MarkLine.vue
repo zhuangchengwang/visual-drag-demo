@@ -1,6 +1,6 @@
 <template>
     <div class="mark-line">
-        <div 
+        <div
             v-for="line in lines"
             :key="line"
             class="line"
@@ -20,7 +20,7 @@ export default {
     data() {
         return {
             lines: ['xt', 'xc', 'xb', 'yl', 'yc', 'yr'], // 分别对应三条横线和三条竖线
-            diff: 3, // 相距 dff 像素将自动吸附
+            diff: 5, // 相距 dff 像素将自动吸附
             lineStatus: {
                 xt: false,
                 xc: false,
@@ -42,6 +42,14 @@ export default {
         })
 
         eventBus.$on('unmove', () => {
+            this.hideLine()
+        })
+        // 监听元素移动和不移动的事件
+        eventBus.$on('resize', (isDownward, isRightward) => {
+            this.showLine(isDownward, isRightward,0)
+        })
+
+        eventBus.$on('unresize', () => {
             this.hideLine()
         })
     },
@@ -74,17 +82,23 @@ export default {
 
             return style
         },
-
-        showLine(isDownward, isRightward) {
+        /**
+         * dragdiff 重新设置吸附距离 0等价于禁用吸附
+         */
+        showLine(isDownward, isRightward,dragdiff=null) {
             const lines = this.$refs
-            const components = this.componentData
+            let components = this.componentData
             const curComponentStyle = this.translateComponentStyle(this.curComponent.style)
             const curComponentHalfwidth = curComponentStyle.width / 2
             const curComponentHalfHeight = curComponentStyle.height / 2
 
+            if(dragdiff!==null){
+                this.diff=dragdiff;
+            }
             this.hideLine()
             components.forEach(component => {
-                if (component == this.curComponent) return
+                if (component.id == this.curComponent.id) return;
+            console.log('components',components,component.style);
                 const componentStyle = this.translateComponentStyle(component.style)
                 const { top, left, bottom, right } = componentStyle
                 const componentHalfwidth = componentStyle.width / 2
@@ -168,27 +182,32 @@ export default {
                         },
                     ],
                 }
-                
+
                 const needToShow = []
                 const { rotate } = this.curComponent.style
+
                 Object.keys(conditions).forEach(key => {
                     // 遍历符合的条件并处理
                     conditions[key].forEach((condition) => {
-                        if (!condition.isNearly) return
-                        // 修改当前组件位移
-                        this.$store.commit('setShapePosStyle', { 
+                        if (!condition.isNearly||!condition.lineNode){
+                            return;
+                        }
+
+                       
+                        // 修改当前组件位移(吸附功能)
+                        this.$store.commit('setShapePosStyle', {
                             key,
                             value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
                         })
-
                         condition.lineNode.style[key] = `${condition.lineShift}px`
                         needToShow.push(condition.line)
+
                     })
                 })
 
                 // 同一方向上同时显示三条线可能不太美观，因此才有了这个解决方案
                 // 同一方向上的线只显示一条，例如多条横条只显示一条横线
-                if (needToShow.length) { 
+                if (needToShow.length) {
                     this.chooseTheTureLine(needToShow, isDownward, isRightward)
                 }
             })
