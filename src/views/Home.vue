@@ -122,9 +122,14 @@ export default {
             e.dataTransfer.dropEffect = 'copy'
         },
 
-        deselectCurComponent() {
-            this.$store.commit('setCurComponent', { component: null, index: null })
-            this.$store.commit('hideContexeMenu')
+        deselectCurComponent(e) {
+            // console.log(e);
+            if(e.target.className==='mark-line'){
+               this.$store.commit('setCurComponent', { component: null, index: null })
+               this.$store.commit('hideContexeMenu')
+            }else{
+                console.log("点击来源不匹配,不操作!"+e.target.className);
+            }
         },
     },
 }

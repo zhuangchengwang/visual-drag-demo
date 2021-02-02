@@ -1,6 +1,8 @@
+/* eslint-disable */
 <template>
     <div class="shape" :class="{ active: this.active }" @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
-        <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i>
+        <!-- 暂时关闭旋转 -->
+        <!-- <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i> -->
         <div
             class="shape-point"
             v-for="(item, index) in (active? pointList : [])"
@@ -124,7 +126,7 @@ export default {
             const hasR = /r/.test(point)
             let newLeft = 0
             let newTop = 0
-            
+
             // 四个角的点
             if (point.length === 2) {
                 newLeft = hasL? 0 : width
@@ -142,7 +144,7 @@ export default {
                     newTop = Math.floor(height / 2)
                 }
             }
-            
+
             const style = {
                 marginLeft: hasR? '-4px' : '-4px',
                 marginTop: '-4px',
@@ -150,7 +152,7 @@ export default {
                 top: `${newTop}px`,
                 cursor: this.cursors[point],
             }
-            
+
             return style
         },
 
@@ -184,8 +186,8 @@ export default {
             if (this.element.component != 'v-text') {
                 e.preventDefault()
             }
-
-            e.stopPropagation()
+            console.log("handleMouseDownOnShape",e);
+            // e.stopPropagation()
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
 
@@ -199,9 +201,13 @@ export default {
             // 如果元素没有移动，则不保存快照
             let hasMove = false
             const move = (moveEvent) => {
-                hasMove = true
+
                 const curX = moveEvent.clientX
                 const curY = moveEvent.clientY
+                if(Math.abs(curY - startY)<3&&Math.abs(curX - startX)<3){
+                    return false;
+                }
+                hasMove = true
                 pos.top = curY - startY + startTop
                 pos.left = curX - startX + startLeft
 
@@ -232,8 +238,11 @@ export default {
 
         selectCurComponent(e) {
             // 阻止向父组件冒泡
-            e.stopPropagation()
+            //(看情况而定,注释掉的话,layui-tab就可以直接切换,和预览效果差不多)
+            // e.stopPropagation()
             e.preventDefault()
+            //置顶
+            // this.$store.commit('topComponent')
             this.$store.commit('hideContexeMenu')
         },
 
@@ -241,24 +250,79 @@ export default {
             const downEvent = window.event
             downEvent.stopPropagation()
             downEvent.preventDefault()
- 
+
             const style = { ...this.defaultStyle }
+            let style_old = JSON.parse(JSON.stringify(style));
+            // console.log("handleMouseDownOnPoint",point,e);
             const center = {
                 x: style.left + style.width / 2,
                 y: style.top + style.height / 2,
             }
+			let curX = e.clientX;
+            let curY = e.clientY;
 
             // 获取画布位移信息
             const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
 
-            // 当前点击坐标
-            const curPoint = {
-                x: e.clientX - editorRectInfo.left,
-                y: e.clientY - editorRectInfo.top,
+            // 当前点击坐标(相对于编辑器的坐标)
+            let curPoint = {
+                x: curX - editorRectInfo.left,
+                y: curY - editorRectInfo.top,
+            }
+            switch(point){
+                case 'r':
+                    curPoint = {
+                        x: style.left+style.width,
+                        y: center.y,
+                    };
+                    break;
+                case 'rt':
+                    curPoint = {
+                        x: style.left+style.width,
+                        y: style.top,
+                    };
+                    break;
+                case 'rb':
+                    curPoint = {
+                        x: style.left+style.width,
+                        y: style.top+style.height,
+                    };
+                    break;
+                case 'l':
+                    curPoint = {
+                        x: style.left,
+                        y: center.y,
+                    };
+                    break;
+                case 'lt':
+                    curPoint = {
+                        x: style.left,
+                        y: style.top,
+                    };
+                    break;
+                case 'lb':
+                    curPoint = {
+                        x: style.left,
+                        y: style.top+style.height,
+                    };
+                    break;
+                case 't':
+                    curPoint = {
+                        x: center.x,
+                        y: style.top,
+                    };
+                    break;
+                case 'b':
+                    curPoint = {
+                        x: center.x,
+                        y: style.top+style.height,
+                    };
+                    break;
             }
 
+
             // 获取对称点的坐标
-            const symmetricPoint = {
+            let symmetricPoint = {
                 x: center.x - (curPoint.x - center.x),
                 y: center.y - (curPoint.y - center.y),
             }
@@ -273,24 +337,39 @@ export default {
                     isFirst = false
                     return
                 }
+				let curX = moveEvent.clientX
+                let curY = moveEvent.clientY
 
                 needSave = true
+                // 当前移动坐标(相对于编辑器的坐标)
                 const curPositon = {
-                    x: moveEvent.clientX - editorRectInfo.left,
-                    y: moveEvent.clientY - editorRectInfo.top,
+                    x: curX - editorRectInfo.left,
+                    y: curY - editorRectInfo.top,
                 }
-                
+                console.log("curPositon:",curPositon)
                 calculateComponentPositonAndSize(point, style, curPositon, {
                     center,
                     curPoint,
                     symmetricPoint,
                 })
 
+
                 this.$store.commit('setShapeStyle', style)
+                const startY = curPoint.y
+                const startX = curPoint.x
+                // 如果不使用 $nextTick，吸附后将无法移动
+                this.$nextTick(() => {
+                    // 触发元素移动事件，用于显示标线、吸附功能
+                    // 后面两个参数代表鼠标移动方向
+                    // curY - startY > 0 true 表示向下移动 false 表示向上移动
+                    // curX - startX > 0 true 表示向右移动 false 表示向左移动
+                    eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
+                })
             }
 
             const up = () => {
                 document.removeEventListener('mousemove', move)
+                eventBus.$emit('unmove')
                 document.removeEventListener('mouseup', up)
                 needSave && this.$store.commit('recordSnapshot')
             }

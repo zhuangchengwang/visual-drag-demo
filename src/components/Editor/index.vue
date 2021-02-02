@@ -1,5 +1,6 @@
+/* eslint-disable */
 <template>
-    <div class="editor" id="editor" 
+    <div class="editor" id="editor"
         :class="{ edit: isEdit }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
         @contextmenu="handleContextMenu"
     >

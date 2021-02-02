@@ -1,6 +1,6 @@
 // 公共样式
 const commonStyle = {
-    rotate: '', 
+    rotate: '',
     opacity: 1,
 }
 
@@ -25,8 +25,8 @@ const list = [
         },
     },
     {
-        component: 'v-button', 
-        label: '按钮', 
+        component: 'v-button',
+        label: '按钮',
         propValue: '按钮',
         icon: 'el-icon-thumb',
         animations: [],
@@ -47,14 +47,40 @@ const list = [
         },
     },
     {
-        component: 'Picture', 
-        label: '图片', 
+        component: 'Picture',
+        label: '图片',
         icon: 'el-icon-picture',
         propValue: require('@/assets/title.jpg'),
         animations: [],
         events: {},
         style: {
             width: 300,
+            height: 200,
+            borderRadius: '',
+        },
+    },
+    {
+        component: 'VDiv',
+        label: 'div',
+        icon: 'el-icon-picture',
+        propValue: '',
+        animations: [],
+        events: {},
+        style: {
+            width: 300,
+            height: 200,
+            borderRadius: '',
+        },
+    },
+    {
+        component: 'LayuiTab',
+        label: 'LayuiTab',
+        icon: 'el-icon-picture',
+        propValue: 'LayuiTab12 ',
+        animations: [],
+        events: {},
+        style: {
+            width: 456,
             height: 200,
             borderRadius: '',
         },

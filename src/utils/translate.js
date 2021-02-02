@@ -22,11 +22,12 @@ export function calculateRotatedPointCoordinate(point, center, rotate) {
      * nx = cosθ * (ax - cx) - sinθ * (ay - cy) + cx
      * ny = sinθ * (ax - cx) + cosθ * (ay - cy) + cy
      */
-
-    return {
+    let pot = {
         x: (point.x - center.x) * Math.cos(angleToRadian(rotate)) - (point.y - center.y) * Math.sin(angleToRadian(rotate)) + center.x,
         y: (point.x - center.x) * Math.sin(angleToRadian(rotate)) + (point.y - center.y) * Math.cos(angleToRadian(rotate)) + center.y,
-    }
+    };
+    
+    return pot;
 }
 
 /**
@@ -93,7 +94,7 @@ export function getRotatedPointCoordinate(style, center, name) {
                 x: style.left + style.width,
                 y: style.top+ style.height,
             }
-            
+
             break
     }
 
@@ -111,7 +112,7 @@ export function getCenterPoint(p1, p2) {
 export function sin(rotate) {
     return Math.abs(Math.sin(angleToRadian(rotate)))
 }
-  
+
 export function cos(rotate) {
     return Math.abs(Math.cos(angleToRadian(rotate)))
 }
