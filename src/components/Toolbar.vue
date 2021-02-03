@@ -5,17 +5,38 @@
             <el-button @click="redo">重做</el-button>
             <label for="input" class="insert">插入图片</label>
             <input type="file" @change="handleFileChange" id="input" hidden />
-            <el-button @click="preview" style="margin-left: 10px;">预览</el-button>
+            <el-button @click="preview" class="mgl10">预览</el-button>
             <el-button @click="save">保存</el-button>
             <el-button @click="clearCanvas">清空画布</el-button>
-            <div class="canvas-config">
+            <el-button type="success" @click="crateCode">生成代码</el-button>
+            <el-select class="mgl10" v-model="canvasMode" @change="selectCanvasMode" placeholder="请选画布大小">
+                <el-option
+                  v-for="item in canvasModes"
+
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+            </el-select>
+           <!-- <div class="canvas-config">
                 <span>画布大小</span>
                 <input v-model="canvasStyleData.width">
                 <span>*</span>
                 <input v-model="canvasStyleData.height">
-            </div>
-        </div>
+            </div> -->
+           <el-checkbox  class="mgl10" v-model="isShadow" @change="isOpenShadow">开启辅助阴影</el-checkbox>
 
+        </div>
+        <el-alert
+                    v-show="!isShadow"
+                    title="关闭辅助阴影,由于背景为纯白色,你可能无法区分元素的边界,尤其是div等容器元素!"
+                    type="warning">
+         </el-alert>
+         <el-alert
+
+                     title="使用帮助:1.使用右侧属性面板可以精调元素宽高和x,y坐标 2.摆放元素时,边框尽量不要相互交错,可以生成更优雅的css"
+                     type="error">
+          </el-alert>
         <!-- 预览 -->
         <Preview v-model="isShowPreview" @change="handlePreviewChange" />
     </div>
@@ -31,7 +52,19 @@ export default {
     components: { Preview },
     data() {
         return {
+            isShadow:true,
             isShowPreview: false,
+            canvasMode:'pc',
+            canvasModes:[
+                {
+                          value: 'phone',
+                          label: '手机模式'
+                },
+                {
+                          value: 'pc',
+                          label: 'pc模式'
+                },
+            ]
         }
     },
     computed: mapState([
@@ -39,6 +72,22 @@ export default {
         'canvasStyleData',
     ]),
     methods: {
+        crateCode(){
+          console.log(this.componentData);
+        },
+        isOpenShadow(v){
+
+           this.$emit('isOpenShadow',v);
+        },
+        selectCanvasMode(v){
+
+          if(v=='phone'){
+              this.$store.commit('setCanvasStyle',{width:375,height:740})
+          }
+          if(v=='pc'){
+                this.$store.commit('setCanvasStyle',{width:1200,height:740})
+            }
+        },
         undo() {
             this.$store.commit('undo')
         },
@@ -62,8 +111,8 @@ export default {
                     this.$store.commit('addComponent', {
                         component: {
                             id: generateID(),
-                            component: 'Picture', 
-                            label: '图片', 
+                            component: 'Picture',
+                            label: '图片',
                             icon: '',
                             propValue: fileResult,
                             animations: [],
@@ -110,12 +159,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .toolbar {
     height: 64px;
     line-height: 64px;
     background: #fff;
     border-bottom: 1px solid #ddd;
-
+    .mgl10{
+        margin-left: 10px;
+    }
     .canvas-config {
         display: inline-block;
         margin-left: 10px;

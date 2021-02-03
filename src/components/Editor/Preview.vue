@@ -64,8 +64,8 @@ export default {
         height: calc(100% - 120px);
         overflow: auto;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        // align-items: center;
+        // justify-content: center;
 
         .canvas {
             background: #fff;

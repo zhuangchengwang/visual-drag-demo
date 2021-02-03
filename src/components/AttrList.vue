@@ -13,7 +13,7 @@
                         :value="item.value"
                     ></el-option>
                 </el-select>
-                <el-input type="number" v-else v-model="curComponent.style[key]" />
+                <el-input type="number" v-else :min="0" v-model="curComponent.style[key]" />
             </el-form-item>
             <el-form-item label="内容" v-if="curComponent && !excludes.includes(curComponent.component)">
                 <el-input type="textarea" v-model="curComponent.propValue" />
@@ -26,7 +26,7 @@
 export default {
     data() {
         return {
-            excludes: ['Picture'], // 这些组件不显示内容
+            excludes: ['Picture','VDiv','LayuiTab'], // 这些组件不显示内容
             options: [
                 {
                     label: '左对齐',

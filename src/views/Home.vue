@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <Toolbar />
+        <Toolbar @isOpenShadow="isOpenShadow" />
 
         <main>
             <!-- 左侧组件列表 -->
@@ -9,7 +9,7 @@
             </section>
             <!-- 中间画布 -->
             <section class="center">
-                <div class="content" @drop="handleDrop" @dragover="handleDragOver" @click="deselectCurComponent">
+                <div :class="{ shadow: isShadow, 'content': true }" @drop="handleDrop" @dragover="handleDragOver" @click="deselectCurComponent">
                     <Editor />
                 </div>
             </section>
@@ -20,14 +20,14 @@
                         <AttrList v-if="curComponent" />
                         <p v-else class="placeholder">请选择组件</p>
                     </el-tab-pane>
-                    <el-tab-pane label="动画" name="animation">
+               <!--     <el-tab-pane label="动画" name="animation">
                         <AnimationList v-if="curComponent" />
                         <p v-else class="placeholder">请选择组件</p>
-                    </el-tab-pane>
-                    <el-tab-pane label="事件" name="events">
+                    </el-tab-pane> -->
+                    <!-- <el-tab-pane label="事件" name="events">
                         <EventList v-if="curComponent" />
                         <p v-else class="placeholder">请选择组件</p>
-                    </el-tab-pane>
+                    </el-tab-pane> -->
                 </el-tabs>
             </section>
         </main>
@@ -50,6 +50,7 @@ export default {
     components: { Editor, ComponentList, AttrList, AnimationList, EventList, Toolbar },
     data() {
         return {
+            isShadow: true,
             activeName: 'attr',
             reSelectAnimateIndex: undefined,
         }
@@ -64,6 +65,9 @@ export default {
         this.listenCopyAndPaste()
     },
     methods: {
+        isOpenShadow(v){
+            this.isShadow = v;
+        },
         listenCopyAndPaste() {
             const ctrlKey = 17, vKey = 86, cKey = 67, xKey = 88
             let isCtrlDown = false

@@ -8,7 +8,8 @@ import '@/custom-component' // 注册自定义组件
 import '@/styles/animate.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/styles/reset.css'
-
+import _ from 'lodash'
+Vue.prototype._ = _
 Vue.use(ElementUI, { size: 'small' })
 Vue.config.productionTip = false
 

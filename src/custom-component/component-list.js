@@ -69,7 +69,16 @@ const list = [
         style: {
             width: 300,
             height: 200,
+            borderWidth: '',
+            borderColor: '',
             borderRadius: '',
+            fontSize: '',
+            fontWeight: '',
+            lineHeight: '',
+            letterSpacing: 0,
+            textAlign: '',
+            color: '',
+            backgroundColor: '',
         },
     },
     {

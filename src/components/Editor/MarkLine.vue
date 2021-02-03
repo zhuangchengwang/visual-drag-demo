@@ -15,12 +15,12 @@
 import eventBus from '@/utils/eventBus'
 import { mapState } from 'vuex'
 import { sin, cos } from '@/utils/translate'
-
+const defaultDiff = 3;
 export default {
     data() {
         return {
             lines: ['xt', 'xc', 'xb', 'yl', 'yc', 'yr'], // 分别对应三条横线和三条竖线
-            diff: 5, // 相距 dff 像素将自动吸附
+            diff: defaultDiff, // 相距 dff 像素将自动吸附
             lineStatus: {
                 xt: false,
                 xc: false,
@@ -38,6 +38,7 @@ export default {
     mounted() {
         // 监听元素移动和不移动的事件
         eventBus.$on('move', (isDownward, isRightward) => {
+            // console.log('move event');
             this.showLine(isDownward, isRightward)
         })
 
@@ -46,6 +47,7 @@ export default {
         })
         // 监听元素移动和不移动的事件
         eventBus.$on('resize', (isDownward, isRightward) => {
+            // console.log('resize event');
             this.showLine(isDownward, isRightward,0)
         })
 
@@ -91,10 +93,7 @@ export default {
             const curComponentStyle = this.translateComponentStyle(this.curComponent.style)
             const curComponentHalfwidth = curComponentStyle.width / 2
             const curComponentHalfHeight = curComponentStyle.height / 2
-
-            if(dragdiff!==null){
-                this.diff=dragdiff;
-            }
+            this.diff = dragdiff !== null?dragdiff:defaultDiff;
             this.hideLine()
             components.forEach(component => {
                 if (component.id == this.curComponent.id) return;
@@ -193,12 +192,15 @@ export default {
                             return;
                         }
 
-                       
-                        // 修改当前组件位移(吸附功能)
-                        this.$store.commit('setShapePosStyle', {
-                            key,
-                            value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
-                        })
+                        if(dragdiff===null){
+                            //resize时不可以使用吸附功能
+                            // 修改当前组件位移(吸附功能)
+                            this.$store.commit('setShapePosStyle', {
+                                key,
+                                value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
+                            })
+                        }
+
                         condition.lineNode.style[key] = `${condition.lineShift}px`
                         needToShow.push(condition.line)
 

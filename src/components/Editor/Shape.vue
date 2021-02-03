@@ -2,7 +2,7 @@
 <template>
     <div class="shape" :class="{ active: this.active }" @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
         <!-- 暂时关闭旋转 -->
-        <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i>
+        <!-- <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i> -->
         <div
             class="shape-point"
             v-for="(item, index) in (active? pointList : [])"
@@ -19,6 +19,7 @@ import eventBus from '@/utils/eventBus'
 import runAnimation from '@/utils/runAnimation'
 import { mapState } from 'vuex'
 import calculateComponentPositonAndSize from '@/utils/calculateComponentPositonAndSize'
+import * as NodeElment from '@/utils/NodeElment'
 
 export default {
     props: {
@@ -211,6 +212,9 @@ export default {
                 pos.top = curY - startY + startTop
                 pos.left = curX - startX + startLeft
 
+                if(!NodeElment.isAContainB(this.$store.state.stage,pos)){
+                    return;
+                }
                 // 修改当前组件样式
                 this.$store.commit('setShapeStyle', pos)
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
@@ -231,7 +235,6 @@ export default {
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
             }
-
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)
         },
@@ -263,62 +266,69 @@ export default {
 
             // 获取画布位移信息
             const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
-
+            let curPoint = {};
             // 当前点击坐标(相对于编辑器的坐标)
-            let curPoint = {
-                x: curX - editorRectInfo.left,
-                y: curY - editorRectInfo.top,
+
+            if(style.rotate!==0 ||style.rotate!==''){
+                //暂时不知道原理是什么,只知道旋转后,采用下方计算公式,伸缩时候位置偏差最新
+                 curPoint = {
+                    x: curX - editorRectInfo.left,
+                    y: curY - editorRectInfo.top,
+                }
+            }else{
+                switch(point){
+                    case 'r':
+                        curPoint = {
+                            x: style.left+style.width,
+                            y: center.y,
+                        };
+                        break;
+                    case 'rt':
+                        curPoint = {
+                            x: style.left+style.width,
+                            y: style.top,
+                        };
+                        break;
+                    case 'rb':
+                        curPoint = {
+                            x: style.left+style.width,
+                            y: style.top+style.height,
+                        };
+                        break;
+                    case 'l':
+                        curPoint = {
+                            x: style.left,
+                            y: center.y,
+                        };
+                        break;
+                    case 'lt':
+                        curPoint = {
+                            x: style.left,
+                            y: style.top,
+                        };
+                        break;
+                    case 'lb':
+                        curPoint = {
+                            x: style.left,
+                            y: style.top+style.height,
+                        };
+                        break;
+                    case 't':
+                        curPoint = {
+                            x: center.x,
+                            y: style.top,
+                        };
+                        break;
+                    case 'b':
+                        curPoint = {
+                            x: center.x,
+                            y: style.top+style.height,
+                        };
+                        break;
+                }
             }
-            switch(point){
-                case 'r':
-                    curPoint = {
-                        x: style.left+style.width,
-                        y: center.y,
-                    };
-                    break;
-                case 'rt':
-                    curPoint = {
-                        x: style.left+style.width,
-                        y: style.top,
-                    };
-                    break;
-                case 'rb':
-                    curPoint = {
-                        x: style.left+style.width,
-                        y: style.top+style.height,
-                    };
-                    break;
-                case 'l':
-                    curPoint = {
-                        x: style.left,
-                        y: center.y,
-                    };
-                    break;
-                case 'lt':
-                    curPoint = {
-                        x: style.left,
-                        y: style.top,
-                    };
-                    break;
-                case 'lb':
-                    curPoint = {
-                        x: style.left,
-                        y: style.top+style.height,
-                    };
-                    break;
-                case 't':
-                    curPoint = {
-                        x: center.x,
-                        y: style.top,
-                    };
-                    break;
-                case 'b':
-                    curPoint = {
-                        x: center.x,
-                        y: style.top+style.height,
-                    };
-                    break;
-            }
+
+
 
 
             // 获取对称点的坐标
@@ -363,14 +373,13 @@ export default {
                     // 后面两个参数代表鼠标移动方向
                     // curY - startY > 0 true 表示向下移动 false 表示向上移动
                     // curX - startX > 0 true 表示向右移动 false 表示向左移动
-                    // eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
                     eventBus.$emit('resize', curY - startY > 0, curX - startX > 0)
+                    this.$store.commit('sort');
                 })
             }
 
             const up = () => {
                 document.removeEventListener('mousemove', move)
-                // eventBus.$emit('unmove')
                 eventBus.$emit('unresize')
                 document.removeEventListener('mouseup', up)
                 needSave && this.$store.commit('recordSnapshot')

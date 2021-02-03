@@ -11,7 +11,7 @@
     text-align: center;
     color: #2c3e50;
 }
-.content .component{
+.content.shadow .component{
     box-shadow:#333 0px 0px 0.8px;
 }
 </style>

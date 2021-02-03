@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import { deepCopy, swap } from '@/utils/utils'
 import toast from '@/utils/toast'
 import generateID from '@/utils/generateID'
+import NodeElment from '@/utils/NodeElment'
 
 Vue.use(Vuex)
 
@@ -12,6 +13,12 @@ const store = new Vuex.Store({
         canvasStyleData: { // 页面全局数据
             width: 1200,
             height: 740,
+        },
+        stage:{
+          x1:0,
+          y1:0,
+          x2:1200,
+          y2:740,
         },
         componentData: [], // 画布组件数据
         curComponent: null,
@@ -38,7 +45,7 @@ const store = new Vuex.Store({
             }
 
             const data = state.copyData.data
-            
+
             if (isMouse) {
                 data.style.top = state.menuTop
                 data.style.left = state.menuLeft
@@ -46,7 +53,7 @@ const store = new Vuex.Store({
                 data.style.top += 10
                 data.style.left += 10
             }
-            
+
             data.id = generateID()
             store.commit('addComponent', { component: data })
             store.commit('recordSnapshot')
@@ -58,7 +65,7 @@ const store = new Vuex.Store({
                 toast('请选择组件')
                 return
             }
-            
+
             if (state.copyData) {
                 store.commit('addComponent', { component: state.copyData.data, index: state.copyData.index })
                 if (state.curComponentIndex >= state.copyData.index) {
@@ -76,7 +83,9 @@ const store = new Vuex.Store({
         },
 
         setCanvasStyle(state, style) {
-            state.canvasStyleData = style
+            state.canvasStyleData = style;
+            state.stage = {x1:0,y1:0,x2:style.width,y2:style.height}
+
         },
 
         addComponent(state, { component, index }) {
@@ -85,13 +94,14 @@ const store = new Vuex.Store({
             } else {
                 state.componentData.push(component)
             }
+			store.commit('sort');
         },
 
         setCurComponent(state, { component, index }) {
             state.curComponent = component
             state.curComponentIndex = index
         },
-        
+
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {
             if (top) curComponent.style.top = top
             if (left) curComponent.style.left = left
@@ -121,7 +131,17 @@ const store = new Vuex.Store({
         setComponentData(state, componentData = []) {
             Vue.set(state, 'componentData', componentData)
         },
-
+        sort(state){
+             state.componentData.sort(function(a,b){
+                 //b能包含a 那么b 就
+                 if(b.style.width<a.style.width && b.style.height<a.style.height){
+                     return -5;
+                 }
+                 // return 0;
+                 return  b.style.width*b.style.height - a.style.width*a.style.height
+             })
+             // Vue.set(state, 'componentData', state.componentData)
+        },
         recordSnapshot(state) {
             // 添加新的快照
             state.snapshotData[++state.snapshotIndex] = deepCopy(state.componentData)
