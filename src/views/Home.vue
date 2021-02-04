@@ -45,7 +45,8 @@ import Toolbar from '@/components/Toolbar'
 import { deepCopy } from '@/utils/utils'
 import { mapState } from 'vuex'
 import generateID from '@/utils/generateID'
-
+import * as NodeElment from '@/utils/NodeElment'
+import eventBus from '@/utils/eventBus'
 export default {
     components: { Editor, ComponentList, AttrList, AnimationList, EventList, Toolbar },
     data() {
@@ -69,7 +70,7 @@ export default {
             this.isShadow = v;
         },
         listenCopyAndPaste() {
-            const ctrlKey = 17, vKey = 86, cKey = 67, xKey = 88
+            const ctrlKey = 17, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
             let isCtrlDown = false
 
             window.onkeydown = (e) => {
@@ -81,12 +82,49 @@ export default {
                     this.$store.commit('paste')
                 } else if (isCtrlDown && e.keyCode == xKey) {
                     this.$store.commit('cut')
+                }else if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
+                    e.preventDefault();
+                    if(this.$store.state.curComponent){
+                        let newpos = JSON.parse(JSON.stringify(this.$store.state.curComponent.style));
+                        switch(e.keyCode){
+                            case 37:
+                                //左
+                                newpos.left--;
+                                break;
+                            case 38:
+                                //上
+                                newpos.top--;
+                                break;
+                            case 39:
+                                //右
+                                newpos.left++;
+                                break;
+                            case 40:
+                                //下
+                                newpos.top++;
+                                break;
+
+                        }
+
+                        if(!NodeElment.isAContainB(this.$store.state.stage,newpos)){
+                            this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
+                            return;
+                        }
+                        this.$store.commit('setShapeStyle', newpos)
+                        eventBus.$emit('keymove', e.keyCode==40, e.keyCode==39)
+
+                    }
                 }
+
             }
 
             window.onkeyup = (e) => {
                 if (e.keyCode == ctrlKey) {
                     isCtrlDown = false
+                }else if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
+                    setTimeout(()=>{
+                         eventBus.$emit('unmove')
+                    },400)
                 }
             }
         },

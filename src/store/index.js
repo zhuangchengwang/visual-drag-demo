@@ -3,8 +3,6 @@ import Vuex from 'vuex'
 import { deepCopy, swap } from '@/utils/utils'
 import toast from '@/utils/toast'
 import generateID from '@/utils/generateID'
-import NodeElment from '@/utils/NodeElment'
-
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -102,9 +100,10 @@ const store = new Vuex.Store({
             state.curComponentIndex = index
         },
 
+
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {
-            if (top) curComponent.style.top = top
-            if (left) curComponent.style.left = left
+            if (!isNaN(top)) curComponent.style.top = top
+            if (!isNaN(left)) curComponent.style.left = left
             if (width) curComponent.style.width = width
             if (height) curComponent.style.height = height
             if (rotate) curComponent.style.rotate = rotate

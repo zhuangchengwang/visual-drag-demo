@@ -1,6 +1,6 @@
 /* eslint-disable */
 <template>
-    <div class="shape" :class="{ active: this.active }" @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
+    <div class="shape" :class="{ active: this.active }"  @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
         <!-- 暂时关闭旋转 -->
         <!-- <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i> -->
         <div
@@ -76,8 +76,10 @@ export default {
                 runAnimation(this.$el, this.curComponent.animations)
             }
         })
+        
     },
     methods: {
+
         // 处理旋转
         handleRotate(e) {
             e.stopPropagation()

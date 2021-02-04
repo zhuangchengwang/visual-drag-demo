@@ -54,6 +54,15 @@ export default {
         eventBus.$on('unresize', () => {
             this.hideLine()
         })
+        // 监听元素移动和不移动的事件
+        eventBus.$on('keymove', (isDownward, isRightward) => {
+            // console.log('resize event');
+            this.showLine(isDownward, isRightward,0)
+        })
+
+        eventBus.$on('unkeymove', () => {
+            this.hideLine()
+        })
     },
     methods: {
         hideLine() {
