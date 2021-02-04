@@ -2,7 +2,7 @@
 <template>
     <div class="shape" :class="{ active: this.active }" @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
         <!-- 暂时关闭旋转 -->
-        <!-- <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i> -->
+        <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i>
         <div
             class="shape-point"
             v-for="(item, index) in (active? pointList : [])"
@@ -16,11 +16,12 @@
 
 <script>
 import eventBus from '@/utils/eventBus'
+import * as utils from '@/utils/utils'
 import runAnimation from '@/utils/runAnimation'
 import { mapState } from 'vuex'
 import calculateComponentPositonAndSize from '@/utils/calculateComponentPositonAndSize'
 import * as NodeElment from '@/utils/NodeElment'
-
+import { calculateRotatedPointCoordinate, getCenterPoint } from '@/utils/translate'
 export default {
     props: {
         active: {
@@ -82,6 +83,7 @@ export default {
             e.stopPropagation()
             // 初始坐标和初始角度
             const pos = { ...this.defaultStyle }
+            utils.changeJsonValue(pos)
             const startY = e.clientY
             const startX = e.clientX
             const startRotate = pos.rotate
@@ -182,7 +184,24 @@ export default {
 
             return result
         },
-
+        _debounce(func, wait = 500) {
+        			      // 这个定时器一定不能是这个函数私有的，一定是要放在Data中，如果
+        			      // 没有放在data中则会出现点击几次就触发几次，虽然说点击后确实会延迟执行，但是没有起到节流应该有的效果
+        			      // let timer = this.timer
+        			      // debugger
+        			      // 这里返回的函数是每次用户实际调用的防抖函数
+        			      // 如果已经设定过定时器了就清空上一次的定时器
+        			      // 开始一个新的定时器，延迟执行用户传入的方法
+        			      // 这里的this一定要保存副本！！！！！！
+        			      var _this = this
+        			      return function(...args) {
+        			        if (_this.timer) clearTimeout(_this.timer)
+        			        // console.log('77')
+        			        _this.timer = setTimeout(() => {
+        			          func.apply(_this, args)
+        			        }, wait)
+        			      }
+        			    },
         handleMouseDownOnShape(e) {
             if (this.element.component != 'v-text') {
                 e.preventDefault()
@@ -193,6 +212,8 @@ export default {
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
 
             const pos = { ...this.defaultStyle }
+
+            utils.changeJsonValue(pos)
             const startY = e.clientY
             const startX = e.clientX
             // 如果直接修改属性，值的类型会变为字符串，所以要转为数值型
@@ -211,8 +232,10 @@ export default {
                 hasMove = true
                 pos.top = curY - startY + startTop
                 pos.left = curX - startX + startLeft
-
                 if(!NodeElment.isAContainB(this.$store.state.stage,pos)){
+                    this._debounce(()=>{
+                        this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
+                    },200)()
                     return;
                 }
                 // 修改当前组件样式
@@ -255,82 +278,80 @@ export default {
             downEvent.preventDefault()
 
             const style = { ...this.defaultStyle }
-            let style_old = JSON.parse(JSON.stringify(style));
+            //如果不经过处理,点击属性面板改变宽高xy等值是会变成字符串,导致下方 +法变成字符串相加
+            utils.changeJsonValue(style)
             // console.log("handleMouseDownOnPoint",point,e);
             const center = {
                 x: style.left + style.width / 2,
                 y: style.top + style.height / 2,
             }
+
 			let curX = e.clientX;
             let curY = e.clientY;
 
             // 获取画布位移信息
             const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
             let curPoint = {};
-            // 当前点击坐标(相对于编辑器的坐标)
-
-            if(style.rotate!==0 ||style.rotate!==''){
-                //暂时不知道原理是什么,只知道旋转后,采用下方计算公式,伸缩时候位置偏差最新
-                 curPoint = {
-                    x: curX - editorRectInfo.left,
-                    y: curY - editorRectInfo.top,
-                }
-            }else{
-                switch(point){
-                    case 'r':
-                        curPoint = {
-                            x: style.left+style.width,
-                            y: center.y,
-                        };
-                        break;
-                    case 'rt':
-                        curPoint = {
-                            x: style.left+style.width,
-                            y: style.top,
-                        };
-                        break;
-                    case 'rb':
-                        curPoint = {
-                            x: style.left+style.width,
-                            y: style.top+style.height,
-                        };
-                        break;
-                    case 'l':
-                        curPoint = {
-                            x: style.left,
-                            y: center.y,
-                        };
-                        break;
-                    case 'lt':
-                        curPoint = {
-                            x: style.left,
-                            y: style.top,
-                        };
-                        break;
-                    case 'lb':
-                        curPoint = {
-                            x: style.left,
-                            y: style.top+style.height,
-                        };
-                        break;
-                    case 't':
-                        curPoint = {
-                            x: center.x,
-                            y: style.top,
-                        };
-                        break;
-                    case 'b':
-                        curPoint = {
-                            x: center.x,
-                            y: style.top+style.height,
-                        };
-                        break;
-                }
+            // 当前点击的拖拽点坐标(相对于编辑器的坐标)
+            // curPoint = {
+            //         x: curX - editorRectInfo.left,
+            //         y: curY - editorRectInfo.top,
+            // }
+            switch(point){
+                case 'r':
+                    curPoint = {
+                        x: style.left+style.width,
+                        y: center.y,
+                    };
+                    break;
+                case 'rt':
+                    curPoint = {
+                        x: style.left+style.width,
+                        y: style.top,
+                    };
+                    break;
+                case 'rb':
+                    curPoint = {
+                        x: style.left+style.width,
+                        y: style.top+style.height,
+                    };
+                    break;
+                case 'l':
+                    curPoint = {
+                        x: style.left,
+                        y: center.y,
+                    };
+                    break;
+                case 'lt':
+                    curPoint = {
+                        x: style.left,
+                        y: style.top,
+                    };
+                    break;
+                case 'lb':
+                    curPoint = {
+                        x: style.left,
+                        y: style.top+style.height,
+                    };
+                    break;
+                case 't':
+                    curPoint = {
+                        x: center.x,
+                        y: style.top,
+                    };
+                    break;
+                case 'b':
+                    curPoint = {
+                        x: center.x,
+                        y: style.top+style.height,
+                    };
+                    break;
             }
-
-
-
-
+            curPoint = calculateRotatedPointCoordinate(curPoint, center, style.rotate)
+            // curPoint = {
+            //     x:Math.round(curPoint.x),
+            //     y:Math.round(curPoint.y),
+            // }
             // 获取对称点的坐标
             let symmetricPoint = {
                 x: center.x - (curPoint.x - center.x),
@@ -356,14 +377,17 @@ export default {
                     x: curX - editorRectInfo.left,
                     y: curY - editorRectInfo.top,
                 }
-                // console.log("curPositon:",curPositon)
                 calculateComponentPositonAndSize(point, style, curPositon, {
                     center,
                     curPoint,
                     symmetricPoint,
                 })
-
-
+                if(!NodeElment.isAContainB(this.$store.state.stage,style)){
+                    this._debounce(()=>{
+                        this.$message.error('越界啦!,伸缩元素时不可以超出画布大小哦!');
+                    },200)()
+                    return;
+                }
                 this.$store.commit('setShapeStyle', style)
                 const startY = curPoint.y
                 const startX = curPoint.x

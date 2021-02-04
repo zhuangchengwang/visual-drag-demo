@@ -64,7 +64,7 @@ export default {
 
         translateComponentStyle(style) {
             style = { ...style }
-            if (style.rotate != 0) {
+            if (style.rotate != 0 ||style.rotate != '') {
                 const newWidth = style.width * cos(style.rotate) + style.height * sin(style.rotate)
                 const diffX = (style.width - newWidth) / 2
                 style.left += diffX
@@ -97,7 +97,7 @@ export default {
             this.hideLine()
             components.forEach(component => {
                 if (component.id == this.curComponent.id) return;
-            console.log('components',components,component.style);
+            // console.log('components',components,component.style);
                 const componentStyle = this.translateComponentStyle(component.style)
                 const { top, left, bottom, right } = componentStyle
                 const componentHalfwidth = componentStyle.width / 2
@@ -191,6 +191,7 @@ export default {
                         if (!condition.isNearly||!condition.lineNode){
                             return;
                         }
+                        console.log(condition);
 
                         if(dragdiff===null){
                             //resize时不可以使用吸附功能

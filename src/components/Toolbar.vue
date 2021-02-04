@@ -27,16 +27,17 @@
            <el-checkbox  class="mgl10" v-model="isShadow" @change="isOpenShadow">开启辅助阴影</el-checkbox>
 
         </div>
-        <el-alert
-                    v-show="!isShadow"
-                    title="关闭辅助阴影,由于背景为纯白色,你可能无法区分元素的边界,尤其是div等容器元素!"
-                    type="warning">
-         </el-alert>
+        
          <el-alert
 
                      title="使用帮助:1.使用右侧属性面板可以精调元素宽高和x,y坐标 2.摆放元素时,边框尽量不要相互交错,可以生成更优雅的css"
-                     type="error">
+                     type="success">
           </el-alert>
+          <el-alert
+                      v-show="!isShadow"
+                      title="关闭辅助阴影,由于背景为纯白色,你可能无法区分元素的边界,尤其是div等容器元素!"
+                      type="warning">
+           </el-alert>
         <!-- 预览 -->
         <Preview v-model="isShowPreview" @change="handlePreviewChange" />
     </div>

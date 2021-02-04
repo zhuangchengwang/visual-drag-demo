@@ -12,6 +12,9 @@
     color: #2c3e50;
 }
 .content.shadow .component{
-    box-shadow:#333 0px 0px 0.8px;
+    box-shadow: #3a8ee6 0px 0px 4px;
+}
+.content .component:hover{
+    box-shadow: #3a8ee6 0px 0px 4px;
 }
 </style>
