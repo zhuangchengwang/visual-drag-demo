@@ -208,10 +208,16 @@ export default {
                     })
                 })
 
-                // 同一方向上同时显示三条线可能不太美观，因此才有了这个解决方案
-                // 同一方向上的线只显示一条，例如多条横条只显示一条横线
+
                 if (needToShow.length) {
-                    this.chooseTheTureLine(needToShow, isDownward, isRightward)
+                    // 同一方向上同时显示三条线可能不太美观，因此才有了这个解决方案
+                    // 同一方向上的线只显示一条，例如多条横条只显示一条横线
+                    // this.chooseTheTureLine(needToShow, isDownward, isRightward)
+                    //方案2,同时显示
+                    for(let li in needToShow){
+                        this.lineStatus[needToShow[li]] = true;
+                    }
+                    console.log(needToShow,JSON.parse(JSON.stringify(this.lineStatus)))
                 }
             })
         },

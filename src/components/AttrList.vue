@@ -13,6 +13,7 @@
                         :value="item.value"
                     ></el-option>
                 </el-select>
+                <el-input type="number" v-else-if="['top','left','width','height'].includes(key)" :min="0" :disabled="true" v-model="curComponent.style[key]" />
                 <el-input type="number" v-else :min="0" v-model="curComponent.style[key]" />
             </el-form-item>
             <el-form-item label="内容" v-if="curComponent && !excludes.includes(curComponent.component)">
@@ -68,6 +69,29 @@ export default {
             return this.$store.state.curComponent
         },
     },
+    methods:{
+        numChange(key){
+            
+            if(['top','left','width','height'].includes(key)){
+               if(!NodeElment.isAContainB(this.$store.state.stage,pos)){
+                   this._debounce(()=>{
+                       this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
+                   },200)()
+                   return;
+               }
+            }
+            if(['top','left'].includes(key)){
+                this.$emit('move', false, false)
+               
+                this.$store.commit('sort');
+            }
+            if(['width','height'].includes(key)){
+              
+                this.$emit('resize',false, false)
+                this.$store.commit('sort');
+            }
+        }
+    }
 }
 </script>
 

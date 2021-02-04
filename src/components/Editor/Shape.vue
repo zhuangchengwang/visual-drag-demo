@@ -2,7 +2,7 @@
 <template>
     <div class="shape" :class="{ active: this.active }" @click="selectCurComponent" @mousedown="handleMouseDownOnShape">
         <!-- 暂时关闭旋转 -->
-        <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i>
+        <!-- <i class="el-icon-refresh-right" v-show="active" @mousedown="handleRotate"></i> -->
         <div
             class="shape-point"
             v-for="(item, index) in (active? pointList : [])"
