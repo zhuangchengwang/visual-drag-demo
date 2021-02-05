@@ -8,7 +8,7 @@
                 <ComponentList />
             </section>
             <!-- 中间画布 -->
-            <section class="center">
+            <section class="center" id="centerSection">
                 <div :class="{ shadow: isShadow, 'content': true }" @drop="handleDrop" @dragover="handleDragOver" @click="deselectCurComponent">
                     <Editor />
                 </div>
@@ -212,10 +212,11 @@ export default {
             background: #f5f5f5;
             height: 100%;
             overflow: auto;
-            padding: 20px;
+            padding-bottom: 5vh;
+            // padding: 20px;
 
             .content {
-                height: 100%;
+                // height: 100%;
                 overflow: auto;
                 // display: flex;
                 // align-items: center;

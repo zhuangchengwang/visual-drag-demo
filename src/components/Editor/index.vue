@@ -1,40 +1,42 @@
 /* eslint-disable */
 <template>
-    <div class="editor" id="editor"
-        :class="{ edit: isEdit }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
-        @contextmenu="handleContextMenu"
-    >
-        <!--页面组件列表展示-->
-        <Shape v-for="(item, index) in componentData"
-            :defaultStyle="item.style"
-            :style="getShapeStyle(item.style)"
-            :key="item.id"
-            :active="item === curComponent"
-            :element="item"
-            :index="index"
+    <div class="contentEditor">
+        <div class="editor" id="editor"
+            :class="{ edit: isEdit }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
+            @contextmenu="handleContextMenu"
         >
-            <component
-                v-if="item.component != 'v-text'"
-                class="component"
-                :is="item.component"
-                :style="getComponentStyle(item.style)"
-                :propValue="item.propValue"
-            />
-
-            <component
-                v-else
-                class="component"
-                :is="item.component"
-                :style="getComponentStyle(item.style)"
-                :propValue="item.propValue"
-                @input="handleInput"
+            <!--页面组件列表展示-->
+            <Shape v-for="(item, index) in componentData"
+                :defaultStyle="item.style"
+                :style="getShapeStyle(item.style)"
+                :key="item.id"
+                :active="item === curComponent"
                 :element="item"
-            />
-        </Shape>
-        <!-- 右击菜单 -->
-        <ContextMenu />
-        <!-- 标线 -->
-        <MarkLine />
+                :index="index"
+            >
+                <component
+                    v-if="item.component != 'v-text'"
+                    class="component"
+                    :is="item.component"
+                    :style="getComponentStyle(item.style)"
+                    :propValue="item.propValue"
+                />
+
+                <component
+                    v-else
+                    class="component"
+                    :is="item.component"
+                    :style="getComponentStyle(item.style)"
+                    :propValue="item.propValue"
+                    @input="handleInput"
+                    :element="item"
+                />
+            </Shape>
+            <!-- 右击菜单 -->
+            <ContextMenu />
+            <!-- 标线 -->
+            <MarkLine />
+        </div>
     </div>
 </template>
 
@@ -113,10 +115,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.contentEditor{
+    padding: 10px;
+    width: 1222px;
+}
 .editor {
     position: relative;
-    background: #fff;
+    background: #ebeef5;
     flex-shrink: 0;
+    box-shadow: #3a8ee6 0px 0px 4px;
 }
 .edit {
     .component {
