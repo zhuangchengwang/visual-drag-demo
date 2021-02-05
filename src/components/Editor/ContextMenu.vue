@@ -6,10 +6,11 @@
                 <li class="lic"  @click="paste">粘贴</li>
                 <li class="lic"  @click="cut">剪切</li>
                 <li class="lic"  @click="deleteComponent">删除</li>
-                <li class="lic"  @click="topComponent">置顶</li>
+                <!-- 已经修改成根据面积大小来决定次序 -->
+                <!-- <li class="lic"  @click="topComponent">置顶</li>
                 <li class="lic"  @click="bottomComponent">置底</li>
                 <li class="lic"  @click="upComponent">上移</li>
-                <li class="lic"  @click="downComponent">下移</li>
+                <li class="lic"  @click="downComponent">下移</li> -->
             </template>
             <li v-else @click="paste">粘贴</li>
         </ul>

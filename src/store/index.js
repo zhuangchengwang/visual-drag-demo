@@ -102,15 +102,15 @@ const store = new Vuex.Store({
 
 
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {
-            if (!isNaN(top)) curComponent.style.top = top
-            if (!isNaN(left)) curComponent.style.left = left
-            if (width) curComponent.style.width = width
-            if (height) curComponent.style.height = height
-            if (rotate) curComponent.style.rotate = rotate
+            if (!isNaN(top)) curComponent.style.top = Math.round(top)
+            if (!isNaN(left)) curComponent.style.left = Math.round(left)
+            if (width) curComponent.style.width = Math.round(width)
+            if (height) curComponent.style.height = Math.round(height)
+            if (rotate) curComponent.style.rotate = Math.round(rotate)
         },
 
         setShapePosStyle({ curComponent }, { key, value }) {
-            curComponent.style[key] = value
+            curComponent.style[key] = Math.round(value)
         },
 
         undo(state) {
