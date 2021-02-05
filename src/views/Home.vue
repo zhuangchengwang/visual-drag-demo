@@ -9,7 +9,7 @@
             </section>
             <!-- 中间画布 -->
             <section class="center" id="centerSection">
-                <div :class="{ shadow: isShadow, 'content': true }" @drop="handleDrop" @dragover="handleDragOver" @click="deselectCurComponent">
+                <div id="shadowcontent" :class="{ shadow: isShadow, 'content': true }" @drop="handleDrop" @dragover="handleDragOver" @click="deselectCurComponent">
                     <Editor />
                 </div>
             </section>

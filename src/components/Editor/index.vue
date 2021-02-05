@@ -117,7 +117,7 @@ export default {
 <style lang="scss" scoped>
 .contentEditor{
     padding: 10px;
-    width: 1222px;
+    min-width: 1000px;
 }
 .editor {
     position: relative;

@@ -9,13 +9,13 @@ const store = new Vuex.Store({
     state: {
         editMode: 'edit', // 编辑器模式 edit read
         canvasStyleData: { // 页面全局数据
-            width: 1200,
+            width: 1000,
             height: 740,
         },
         stage:{
           x1:0,
           y1:0,
-          x2:1200,
+          x2:1000,
           y2:740,
         },
         componentData: [], // 画布组件数据

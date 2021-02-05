@@ -86,7 +86,7 @@ export default {
               this.$store.commit('setCanvasStyle',{width:375,height:740})
           }
           if(v=='pc'){
-                this.$store.commit('setCanvasStyle',{width:1200,height:740})
+                this.$store.commit('setCanvasStyle',{width:1000,height:740})
             }
         },
         undo() {
