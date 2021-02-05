@@ -42,7 +42,7 @@ import AnimationList from '@/components/AnimationList' // 右侧动画列表
 import EventList from '@/components/EventList' // 右侧事件列表
 import componentList from '@/custom-component/component-list' // 左侧列表数据
 import Toolbar from '@/components/Toolbar'
-import { deepCopy } from '@/utils/utils'
+import { deepCopy,getPositionByEditor } from '@/utils/utils'
 import { mapState } from 'vuex'
 import generateID from '@/utils/generateID'
 import * as NodeElment from '@/utils/NodeElment'
@@ -71,16 +71,17 @@ export default {
         },
         listenCopyAndPaste() {
             const ctrlKey = 17, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
-            let isCtrlDown = false
+
 
             window.onkeydown = (e) => {
-                if (e.keyCode == ctrlKey) {
-                    isCtrlDown = true
-                } else if (isCtrlDown && e.keyCode == cKey) {
+                if(e.keyCode == ctrlKey){
+                    eventBus.$emit('clickCtrlKey');
+                }
+                if (e.ctrlKey && e.keyCode == cKey) {
                     this.$store.commit('copy')
-                } else if (isCtrlDown && e.keyCode == vKey) {
+                } else if (e.ctrlKey  && e.keyCode == vKey) {
                     this.$store.commit('paste')
-                } else if (isCtrlDown && e.keyCode == xKey) {
+                } else if (e.ctrlKey  && e.keyCode == xKey) {
                     this.$store.commit('cut')
                 }else if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
                     e.preventDefault();
@@ -119,9 +120,11 @@ export default {
             }
 
             window.onkeyup = (e) => {
-                if (e.keyCode == ctrlKey) {
-                    isCtrlDown = false
-                }else if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
+
+                if(e.keyCode == ctrlKey){
+                    eventBus.$emit('releaseCtrlKey');
+                }
+                if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
                     setTimeout(()=>{
                          eventBus.$emit('unmove')
                     },400)
@@ -152,8 +155,9 @@ export default {
             e.preventDefault()
             e.stopPropagation()
             const component = deepCopy(componentList[e.dataTransfer.getData('index')])
-            component.style.top = e.offsetY
-            component.style.left = e.offsetX
+            let lefttop = getPositionByEditor(e.clientX,e.clientY)
+            component.style.top = lefttop.top
+            component.style.left = lefttop.left
             component.id = generateID()
             NodeElment.isAContainBResize(this.$store.state.stage,component.style,component.style)
             this.$store.commit('addComponent', { component })

@@ -2,7 +2,11 @@
     <div class="attr-list">
         <el-form>
             <el-form-item v-for="(key, index) in styleKeys.filter(item => item != 'rotate')" :key="index" :label="map[key]">
-                <el-color-picker v-if="['borderColor','color','backgroundColor'].includes(key)" v-model="curComponent.style[key]"></el-color-picker>
+                <el-color-picker
+                v-if="['borderColor','color','backgroundColor'].includes(key)"
+                show-alpha
+                :predefine="predefineColors"
+                v-model="curComponent.style[key]"></el-color-picker>
                 <el-select v-else-if="key == 'textAlign'" v-model="curComponent.style[key]">
                     <el-option
                         v-for="item in options"
@@ -25,6 +29,25 @@ export default {
     data() {
         return {
             excludes: ['Picture','VDiv','LayuiTab'], // 这些组件不显示内容
+            predefineColors: [
+                      
+                      '#f0f0f0',
+                      '#ff4500',
+                      '#ffffff',
+                      '#ff8c00',
+                      '#ffd700',
+                      '#90ee90',
+                      '#00ced1',
+                      '#1e90ff',
+                      '#c71585',
+                      'rgba(255, 69, 0, 0.68)',
+                      'rgb(255, 120, 0)',
+                      'hsv(51, 100, 98)',
+                      'hsva(120, 40, 94, 0.5)',
+                      'hsl(181, 100%, 37%)',
+                      'hsla(209, 100%, 56%, 0.73)',
+                      '#c7158577'
+            ],
             options: [
                 {
                     label: '左对齐',

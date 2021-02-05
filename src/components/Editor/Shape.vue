@@ -203,8 +203,31 @@ export default {
         			          func.apply(_this, args)
         			        }, wait)
         			      }
-        			    },
+        },
+        containerScoll(xdiff,ydiff,pos){
+            //判断是否在编辑器滚动条区域内
+            let centerSectionRect = document.querySelector('#centerSection').getBoundingClientRect();
+            let centerSectionPos = {
+                left:0+document.querySelector('#shadowcontent').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
+                top:0+document.querySelector('#shadowcontent').scrollTop,
+                width:centerSectionRect.width,
+                height:centerSectionRect.height,
+            }
+            let containInfo ={x:false,y:false};
+            if(!NodeElment.isAContainB(centerSectionPos, pos,null,containInfo)){
+                if(!containInfo.x){
+                    document.querySelector('#shadowcontent').scrollLeft+=xdiff>0?10:-10;
+                }
+                if(!containInfo.y){
+                    document.querySelector('#centerSection').scrollTop+=ydiff>0?10:-10;
+                }
+            }
+        },
         handleMouseDownOnShape(e) {
+            if(e.ctrlKey){
+                e.preventDefault()
+                return;
+            }
             if (this.element.component != 'v-text') {
                 e.preventDefault()
             }
@@ -231,23 +254,7 @@ export default {
                 // curX - startX > 0 true 表示向右移动 false 表示向左移动
                 const xdiff = curX - startX
                 const ydiff = curY - startY
-                //判断是否在编辑器滚动条区域内
-                let centerSectionRect = document.querySelector('#centerSection').getBoundingClientRect();
-                let centerSectionPos = {
-                    left:0+document.querySelector('#shadowcontent').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
-                    top:0+document.querySelector('#shadowcontent').scrollTop,
-                    width:centerSectionRect.width,
-                    height:centerSectionRect.height,
-                }
-                let containInfo ={x:false,y:false};
-                if(!NodeElment.isAContainB(centerSectionPos, pos,null,containInfo)){
-                    if(!containInfo.x){
-                        document.querySelector('#shadowcontent').scrollLeft+=xdiff>0?10:-10;
-                    }
-                    if(!containInfo.y){
-                        document.querySelector('#centerSection').scrollTop+=ydiff>0?10:-10;
-                    }
-                }
+                this.containerScoll(xdiff,ydiff,pos)
                 if(Math.abs(ydiff)<3&&Math.abs(xdiff)<3){
                     return false;
                 }
@@ -290,6 +297,10 @@ export default {
         },
 
         handleMouseDownOnPoint(point, e) {
+            if(e.ctrlKey){
+                e.preventDefault()
+                return;
+            }
             const downEvent = window.event
             downEvent.stopPropagation()
             downEvent.preventDefault()
@@ -405,23 +416,7 @@ export default {
                 const startX = curPoint.x
                 const xdiff = curX - startX
                 const ydiff = curY - startY
-                //判断是否在编辑器滚动条区域内
-                let centerSectionRect = document.querySelector('#centerSection').getBoundingClientRect();
-                let centerSectionPos = {
-                    left:0+document.querySelector('#shadowcontent').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
-                    top:0+document.querySelector('#shadowcontent').scrollTop,
-                    width:centerSectionRect.width,
-                    height:centerSectionRect.height,
-                }
-                let containInfo ={x:false,y:false};
-                if(!NodeElment.isAContainB(centerSectionPos, style,null,containInfo)){
-                    if(!containInfo.x){
-                        document.querySelector('#shadowcontent').scrollLeft+=xdiff>0?10:-10;
-                    }
-                    if(!containInfo.y){
-                        document.querySelector('#centerSection').scrollTop+=ydiff>0?10:-10;
-                    }
-                }
+                this.containerScoll(xdiff,ydiff,style)
                 // 如果不使用 $nextTick，吸附后将无法移动
                 this.$nextTick(() => {
                     // 触发元素移动事件，用于显示标线、吸附功能

@@ -46,3 +46,8 @@ export function  changeJsonValue(obj) {
 				}
 	}
 }
+
+export function getPositionByEditor(x,y){
+    const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
+    return {left:Math.round(x-editorRectInfo.left),top:Math.round(y-editorRectInfo.top)}
+}

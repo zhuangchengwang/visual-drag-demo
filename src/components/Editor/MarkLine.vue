@@ -58,7 +58,7 @@ export default {
         // 监听元素移动和不移动的事件
         eventBus.$on('keymove', (isDownward, isRightward) => {
             // console.log('resize event');
-            
+
             this.showLine(isDownward, isRightward,0)
         })
 
@@ -101,7 +101,7 @@ export default {
         showLine(isDownward, isRightward,dragdiff=null) {
             const lines = this.$refs
             let components = this.componentData
-            const curComponentStyle = this.translateComponentStyle(this.curComponent.style)
+            let curComponentStyle = this.translateComponentStyle(this.curComponent.style)
             const curComponentHalfwidth = curComponentStyle.width / 2
             const curComponentHalfHeight = curComponentStyle.height / 2
             this.diff = dragdiff !== null?dragdiff:defaultDiff;
@@ -118,6 +118,7 @@ export default {
                     top: [
                         {
                             isNearly: this.isNearly(curComponentStyle.top, top),
+                            iseq: curComponentStyle.top==top,
                             lineNode: lines.xt[0], // xt
                             line: 'xt',
                             dragShift: top,
@@ -125,6 +126,7 @@ export default {
                         },
                         {
                             isNearly: this.isNearly(curComponentStyle.bottom, top),
+                            iseq: curComponentStyle.bottom==top,
                             lineNode: lines.xt[0], // xt
                             line: 'xt',
                             dragShift: top - curComponentStyle.height,
@@ -133,6 +135,7 @@ export default {
                         {
                             // 组件与拖拽节点的中间是否对齐
                             isNearly: this.isNearly(curComponentStyle.top + curComponentHalfHeight, top + componentHalfHeight),
+                            iseq: (curComponentStyle.top + curComponentHalfHeight)==(top + componentHalfHeight),
                             lineNode: lines.xc[0], // xc
                             line: 'xc',
                             dragShift: top + componentHalfHeight - curComponentHalfHeight,
@@ -140,6 +143,7 @@ export default {
                         },
                         {
                             isNearly: this.isNearly(curComponentStyle.top, bottom),
+                            iseq: curComponentStyle.top==bottom,
                             lineNode: lines.xb[0], // xb
                             line: 'xb',
                             dragShift: bottom,
@@ -147,6 +151,7 @@ export default {
                         },
                         {
                             isNearly: this.isNearly(curComponentStyle.bottom, bottom),
+                            iseq: curComponentStyle.bottom==bottom,
                             lineNode: lines.xb[0], // xb
                             line: 'xb',
                             dragShift: bottom - curComponentStyle.height,
@@ -156,6 +161,7 @@ export default {
                     left: [
                         {
                             isNearly: this.isNearly(curComponentStyle.left, left),
+                            iseq: curComponentStyle.left==left,
                             lineNode: lines.yl[0], // yl
                             line: 'yl',
                             dragShift: left,
@@ -163,6 +169,7 @@ export default {
                         },
                         {
                             isNearly: this.isNearly(curComponentStyle.right, left),
+                            iseq: curComponentStyle.right==left,
                             lineNode: lines.yl[0], // yl
                             line: 'yl',
                             dragShift: left - curComponentStyle.width,
@@ -171,6 +178,7 @@ export default {
                         {
                             // 组件与拖拽节点的中间是否对齐
                             isNearly: this.isNearly(curComponentStyle.left + curComponentHalfwidth, left + componentHalfwidth),
+                            iseq: (curComponentStyle.left + curComponentHalfwidth)==(left + componentHalfwidth),
                             lineNode: lines.yc[0], // yc
                             line: 'yc',
                             dragShift: left + componentHalfwidth - curComponentHalfwidth,
@@ -178,6 +186,7 @@ export default {
                         },
                         {
                             isNearly: this.isNearly(curComponentStyle.left, right),
+                            iseq:curComponentStyle.left == right,
                             lineNode: lines.yr[0], // yr
                             line: 'yr',
                             dragShift: right,
@@ -185,6 +194,126 @@ export default {
                         },
                         {
                             isNearly: this.isNearly(curComponentStyle.right, right),
+                            iseq:curComponentStyle.right == right,
+                            lineNode: lines.yr[0], // yr
+                            line: 'yr',
+                            dragShift: right - curComponentStyle.width,
+                            lineShift: right,
+                        },
+                    ],
+                }
+                const { rotate } = this.curComponent.style
+                Object.keys(conditions).forEach(key => {
+                    // 遍历符合的条件并处理
+                    conditions[key].forEach((condition) => {
+                        if (!condition.isNearly||!condition.lineNode){
+                            return;
+                        }
+                        // console.log(condition);
+
+                        if(dragdiff===null){
+                            //resize时不可以使用吸附功能
+                            // 修改当前组件位移(吸附功能)
+                            this.$store.commit('setShapePosStyle', {
+                                key,
+                                value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
+                            })
+                        }
+                    })
+                })
+
+            })
+            //重新获取
+            curComponentStyle = this.translateComponentStyle(this.curComponent.style)
+            components.forEach(component => {
+                if (component.id == this.curComponent.id) return;
+            // console.log('components',components,component.style);
+                const componentStyle = this.translateComponentStyle(component.style)
+                const { top, left, bottom, right } = componentStyle
+                const componentHalfwidth = componentStyle.width / 2
+                const componentHalfHeight = componentStyle.height / 2
+
+                const conditions = {
+                    top: [
+                        {
+                            isNearly: this.isNearly(curComponentStyle.top, top),
+                            iseq: curComponentStyle.top==top,
+                            lineNode: lines.xt[0], // xt
+                            line: 'xt',
+                            dragShift: top,
+                            lineShift: top,
+                        },
+                        {
+                            isNearly: this.isNearly(curComponentStyle.bottom, top),
+                            iseq: curComponentStyle.bottom==top,
+                            lineNode: lines.xt[0], // xt
+                            line: 'xt',
+                            dragShift: top - curComponentStyle.height,
+                            lineShift: top,
+                        },
+                        {
+                            // 组件与拖拽节点的中间是否对齐
+                            isNearly: this.isNearly(curComponentStyle.top + curComponentHalfHeight, top + componentHalfHeight),
+                            iseq: (curComponentStyle.top + curComponentHalfHeight)==(top + componentHalfHeight),
+                            lineNode: lines.xc[0], // xc
+                            line: 'xc',
+                            dragShift: top + componentHalfHeight - curComponentHalfHeight,
+                            lineShift: top + componentHalfHeight,
+                        },
+                        {
+                            isNearly: this.isNearly(curComponentStyle.top, bottom),
+                            iseq: curComponentStyle.top==bottom,
+                            lineNode: lines.xb[0], // xb
+                            line: 'xb',
+                            dragShift: bottom,
+                            lineShift: bottom,
+                        },
+                        {
+                            isNearly: this.isNearly(curComponentStyle.bottom, bottom),
+                            iseq: curComponentStyle.bottom==bottom,
+                            lineNode: lines.xb[0], // xb
+                            line: 'xb',
+                            dragShift: bottom - curComponentStyle.height,
+                            lineShift: bottom,
+                        },
+                    ],
+                    left: [
+                        {
+                            isNearly: this.isNearly(curComponentStyle.left, left),
+                            iseq: curComponentStyle.left==left,
+                            lineNode: lines.yl[0], // yl
+                            line: 'yl',
+                            dragShift: left,
+                            lineShift: left,
+                        },
+                        {
+                            isNearly: this.isNearly(curComponentStyle.right, left),
+                            iseq: curComponentStyle.right==left,
+                            lineNode: lines.yl[0], // yl
+                            line: 'yl',
+                            dragShift: left - curComponentStyle.width,
+                            lineShift: left,
+                        },
+                        {
+                            // 组件与拖拽节点的中间是否对齐
+                            isNearly: this.isNearly(curComponentStyle.left + curComponentHalfwidth, left + componentHalfwidth),
+                            iseq: (curComponentStyle.left + curComponentHalfwidth)==(left + componentHalfwidth),
+                            lineNode: lines.yc[0], // yc
+                            line: 'yc',
+                            dragShift: left + componentHalfwidth - curComponentHalfwidth,
+                            lineShift: left + componentHalfwidth,
+                        },
+                        {
+                            isNearly: this.isNearly(curComponentStyle.left, right),
+                            iseq:curComponentStyle.left == right,
+                            lineNode: lines.yr[0], // yr
+                            line: 'yr',
+                            dragShift: right,
+                            lineShift: right,
+                        },
+                        {
+                            isNearly: this.isNearly(curComponentStyle.right, right),
+                            iseq:curComponentStyle.right == right,
                             lineNode: lines.yr[0], // yr
                             line: 'yr',
                             dragShift: right - curComponentStyle.width,
@@ -199,27 +328,14 @@ export default {
                 Object.keys(conditions).forEach(key => {
                     // 遍历符合的条件并处理
                     conditions[key].forEach((condition) => {
-                        if (!condition.isNearly||!condition.lineNode){
+                        if (!condition.iseq||!condition.lineNode){
                             return;
                         }
-                        console.log(condition);
-
-                        if(dragdiff===null){
-                            //resize时不可以使用吸附功能
-                            // 修改当前组件位移(吸附功能)
-                            this.$store.commit('setShapePosStyle', {
-                                key,
-                                value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
-                            })
-                        }
-
+                        //全等才显示对齐参考线,相近表现为吸附
                         condition.lineNode.style[key] = `${condition.lineShift}px`
                         needToShow.push(condition.line)
-
                     })
                 })
-
-
                 if (needToShow.length) {
                     // 同一方向上同时显示三条线可能不太美观，因此才有了这个解决方案
                     // 同一方向上的线只显示一条，例如多条横条只显示一条横线
@@ -228,7 +344,7 @@ export default {
                     for(let li in needToShow){
                         this.lineStatus[needToShow[li]] = true;
                     }
-                    console.log(needToShow,JSON.parse(JSON.stringify(this.lineStatus)))
+                    // console.log(needToShow,JSON.parse(JSON.stringify(this.lineStatus)))
                 }
             })
         },
