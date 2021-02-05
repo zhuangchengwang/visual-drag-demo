@@ -17,8 +17,9 @@ function changePos(rec){
  * @param {Object} aNode_borderPosition_1
  * @param {Object} bNode_borderPosition_1
  * @param {Object} nearlyPos 返回最近不超出边界的left和top值
+ * @param {Object} containInfo 返回纵横方向是否越界的信息
  */
-export function isAContainB(aNode_borderPosition_1, bNode_borderPosition_1,nearlyPos=null){
+export function isAContainB(aNode_borderPosition_1, bNode_borderPosition_1,nearlyPos=null,containInfo=null){
        //避免影响对象的值
        let aNode_borderPosition = changePos(aNode_borderPosition_1);
        let bNode_borderPosition = changePos(bNode_borderPosition_1);
@@ -30,6 +31,15 @@ export function isAContainB(aNode_borderPosition_1, bNode_borderPosition_1,nearl
        let  b_y1 = bNode_borderPosition['y1'];
        let  b_x2 = bNode_borderPosition['x2'];
        let b_y2 = bNode_borderPosition['y2'];
+
+       if(containInfo){
+           if(b_x1>=a_x1 && b_x2<=a_x2 ){
+               containInfo.x = true;
+           }
+           if(b_y1>=a_y1 && b_y2<=a_y2 ){
+               containInfo.y = true;
+           }
+       }
        if(a_x1<=b_x1&&a_x2>=b_x2&&a_y1<=b_y1&&a_y2>=b_y2){
             //排除全等
             // if(a_x1==b_x1&&a_x2==b_x2&&a_y1==b_y1&&a_y2==b_y2){
@@ -67,7 +77,7 @@ export function isAContainB(aNode_borderPosition_1, bNode_borderPosition_1,nearl
  * @param {Object} bNode_borderPosition_1
  * @param {Object} nearlyWh 返回最近不超出边界的width和height值
  */
-export function isAContainBResize(aNode_borderPosition_1, bNode_borderPosition_1,nearlyWh=null){
+export function isAContainBResize(aNode_borderPosition_1, bNode_borderPosition_1,nearlyWh=null,containInfo=null){
        //避免影响对象的值
        let aNode_borderPosition = changePos(aNode_borderPosition_1);
        let bNode_borderPosition = changePos(bNode_borderPosition_1);
@@ -79,6 +89,15 @@ export function isAContainBResize(aNode_borderPosition_1, bNode_borderPosition_1
        let  b_y1 = bNode_borderPosition['y1'];
        let  b_x2 = bNode_borderPosition['x2'];
        let b_y2 = bNode_borderPosition['y2'];
+
+       if(containInfo){
+           if(b_x1>=a_x1 && b_x2<=a_x2 ){
+               containInfo.x = true;
+           }
+           if(b_y1>=a_y1 && b_y2<=a_y2 ){
+               containInfo.y = true;
+           }
+       }
        if(a_x1<=b_x1&&a_x2>=b_x2&&a_y1<=b_y1&&a_y2>=b_y2){
             //排除全等
             // if(a_x1==b_x1&&a_x2==b_x2&&a_y1==b_y1&&a_y2==b_y2){

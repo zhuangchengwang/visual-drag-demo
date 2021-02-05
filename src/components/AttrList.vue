@@ -2,9 +2,7 @@
     <div class="attr-list">
         <el-form>
             <el-form-item v-for="(key, index) in styleKeys.filter(item => item != 'rotate')" :key="index" :label="map[key]">
-                <el-color-picker v-if="key == 'borderColor'" v-model="curComponent.style[key]"></el-color-picker>
-                <el-color-picker v-else-if="key == 'color'" v-model="curComponent.style[key]"></el-color-picker>
-                <el-color-picker v-else-if="key == 'backgroundColor'" v-model="curComponent.style[key]"></el-color-picker>
+                <el-color-picker v-if="['borderColor','color','backgroundColor'].includes(key)" v-model="curComponent.style[key]"></el-color-picker>
                 <el-select v-else-if="key == 'textAlign'" v-model="curComponent.style[key]">
                     <el-option
                         v-for="item in options"
@@ -13,8 +11,7 @@
                         :value="item.value"
                     ></el-option>
                 </el-select>
-                <el-input type="number" v-else-if="['top','left','width','height'].includes(key)" :min="0" :disabled="true" v-model="curComponent.style[key]" />
-                <el-input type="number" v-else :min="0" v-model="curComponent.style[key]" />
+                <el-input type="number" v-else :min="0" :max="stage.width" v-model="curComponent.style[key]" />
             </el-form-item>
             <el-form-item label="内容" v-if="curComponent && !excludes.includes(curComponent.component)">
                 <el-input type="textarea" v-model="curComponent.propValue" />
@@ -68,10 +65,13 @@ export default {
         curComponent() {
             return this.$store.state.curComponent
         },
+        stage() {
+            return this.$store.state.canvasStyleData
+        },
     },
     methods:{
         numChange(key){
-            
+
             if(['top','left','width','height'].includes(key)){
                if(!NodeElment.isAContainB(this.$store.state.stage,pos)){
                    this._debounce(()=>{
@@ -82,11 +82,11 @@ export default {
             }
             if(['top','left'].includes(key)){
                 this.$emit('move', false, false)
-               
+
                 this.$store.commit('sort');
             }
             if(['width','height'].includes(key)){
-              
+
                 this.$emit('resize',false, false)
                 this.$store.commit('sort');
             }

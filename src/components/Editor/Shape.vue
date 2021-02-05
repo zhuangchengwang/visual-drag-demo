@@ -225,16 +225,37 @@ export default {
             // 如果元素没有移动，则不保存快照
             let hasMove = false
             const move = (moveEvent) => {
-
                 const curX = moveEvent.clientX
                 const curY = moveEvent.clientY
-                if(Math.abs(curY - startY)<3&&Math.abs(curX - startX)<3){
+                // curY - startY > 0 true 表示向下移动 false 表示向上移动
+                // curX - startX > 0 true 表示向右移动 false 表示向左移动
+                const xdiff = curX - startX
+                const ydiff = curY - startY
+                //判断是否在编辑器滚动条区域内
+                let centerSectionRect = document.querySelector('#centerSection').getBoundingClientRect();
+                let centerSectionPos = {
+                    left:0+document.querySelector('.shadow.content').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
+                    top:0+document.querySelector('.shadow.content').scrollTop,
+                    width:centerSectionRect.width,
+                    height:centerSectionRect.height,
+                }
+                let containInfo ={x:false,y:false};
+                if(!NodeElment.isAContainB(centerSectionPos, pos,null,containInfo)){
+                    if(!containInfo.x){
+                        document.querySelector('.shadow.content').scrollLeft+=xdiff>0?10:-10;
+                    }
+                    if(!containInfo.y){
+                        document.querySelector('#centerSection').scrollTop+=ydiff>0?10:-10;
+                    }
+                }
+                if(Math.abs(ydiff)<3&&Math.abs(xdiff)<3){
                     return false;
                 }
                 hasMove = true
-                pos.top = curY - startY + startTop
-                pos.left = curX - startX + startLeft
+                pos.top = ydiff + startTop
+                pos.left = xdiff + startLeft
                 NodeElment.isAContainB(this.$store.state.stage,pos,pos)
+
                 // 修改当前组件样式
                 this.$store.commit('setShapeStyle', pos)
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
@@ -242,9 +263,8 @@ export default {
                 this.$nextTick(() => {
                     // 触发元素移动事件，用于显示标线、吸附功能
                     // 后面两个参数代表鼠标移动方向
-                    // curY - startY > 0 true 表示向下移动 false 表示向上移动
-                    // curX - startX > 0 true 表示向右移动 false 表示向左移动
-                    eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
+
+                    eventBus.$emit('move', ydiff > 0, xdiff > 0)
                 })
             }
 
@@ -383,6 +403,25 @@ export default {
                 this.$store.commit('setShapeStyle', style)
                 const startY = curPoint.y
                 const startX = curPoint.x
+                const xdiff = curX - startX
+                const ydiff = curY - startY
+                //判断是否在编辑器滚动条区域内
+                let centerSectionRect = document.querySelector('#centerSection').getBoundingClientRect();
+                let centerSectionPos = {
+                    left:0+document.querySelector('.shadow.content').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
+                    top:0+document.querySelector('.shadow.content').scrollTop,
+                    width:centerSectionRect.width,
+                    height:centerSectionRect.height,
+                }
+                let containInfo ={x:false,y:false};
+                if(!NodeElment.isAContainB(centerSectionPos, style,null,containInfo)){
+                    if(!containInfo.x){
+                        document.querySelector('.shadow.content').scrollLeft+=xdiff>0?10:-10;
+                    }
+                    if(!containInfo.y){
+                        document.querySelector('#centerSection').scrollTop+=ydiff>0?10:-10;
+                    }
+                }
                 // 如果不使用 $nextTick，吸附后将无法移动
                 this.$nextTick(() => {
                     // 触发元素移动事件，用于显示标线、吸附功能
