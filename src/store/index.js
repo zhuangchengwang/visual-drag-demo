@@ -110,7 +110,14 @@ const store = new Vuex.Store({
         },
 
         setShapePosStyle({ curComponent }, { key, value }) {
-            curComponent.style[key] = Math.round(value)
+            value = Math.round(value);
+            if(key=='top'){
+                value = value<store.state.stage.y1?store.state.stage.y1:value;
+            }
+            if(key=='left'){
+                value = value<store.state.stage.x1?store.state.stage.x1:value;
+            }
+            curComponent.style[key] = value
         },
 
         undo(state) {

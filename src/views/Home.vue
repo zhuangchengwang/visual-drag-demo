@@ -155,6 +155,7 @@ export default {
             component.style.top = e.offsetY
             component.style.left = e.offsetX
             component.id = generateID()
+            NodeElment.isAContainBResize(this.$store.state.stage,component.style,component.style)
             this.$store.commit('addComponent', { component })
             this.$store.commit('recordSnapshot')
         },
@@ -202,6 +203,7 @@ export default {
             width: 262px;
             right: 0;
             top: 0;
+            padding-bottom: 67px;
         }
 
         .center {

@@ -76,7 +76,7 @@ export default {
                 runAnimation(this.$el, this.curComponent.animations)
             }
         })
-        
+
     },
     methods: {
 
@@ -234,12 +234,7 @@ export default {
                 hasMove = true
                 pos.top = curY - startY + startTop
                 pos.left = curX - startX + startLeft
-                if(!NodeElment.isAContainB(this.$store.state.stage,pos)){
-                    this._debounce(()=>{
-                        this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
-                    },200)()
-                    return;
-                }
+                NodeElment.isAContainB(this.$store.state.stage,pos,pos)
                 // 修改当前组件样式
                 this.$store.commit('setShapeStyle', pos)
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
@@ -384,12 +379,7 @@ export default {
                     curPoint,
                     symmetricPoint,
                 })
-                if(!NodeElment.isAContainB(this.$store.state.stage,style)){
-                    this._debounce(()=>{
-                        this.$message.error('越界啦!,伸缩元素时不可以超出画布大小哦!');
-                    },200)()
-                    return;
-                }
+                NodeElment.isAContainBResize(this.$store.state.stage,style,style)
                 this.$store.commit('setShapeStyle', style)
                 const startY = curPoint.y
                 const startX = curPoint.x
