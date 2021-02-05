@@ -234,15 +234,15 @@ export default {
                 //判断是否在编辑器滚动条区域内
                 let centerSectionRect = document.querySelector('#centerSection').getBoundingClientRect();
                 let centerSectionPos = {
-                    left:0+document.querySelector('.shadow.content').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
-                    top:0+document.querySelector('.shadow.content').scrollTop,
+                    left:0+document.querySelector('#shadowcontent').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
+                    top:0+document.querySelector('#shadowcontent').scrollTop,
                     width:centerSectionRect.width,
                     height:centerSectionRect.height,
                 }
                 let containInfo ={x:false,y:false};
                 if(!NodeElment.isAContainB(centerSectionPos, pos,null,containInfo)){
                     if(!containInfo.x){
-                        document.querySelector('.shadow.content').scrollLeft+=xdiff>0?10:-10;
+                        document.querySelector('#shadowcontent').scrollLeft+=xdiff>0?10:-10;
                     }
                     if(!containInfo.y){
                         document.querySelector('#centerSection').scrollTop+=ydiff>0?10:-10;
@@ -408,15 +408,15 @@ export default {
                 //判断是否在编辑器滚动条区域内
                 let centerSectionRect = document.querySelector('#centerSection').getBoundingClientRect();
                 let centerSectionPos = {
-                    left:0+document.querySelector('.shadow.content').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
-                    top:0+document.querySelector('.shadow.content').scrollTop,
+                    left:0+document.querySelector('#shadowcontent').scrollLeft+(xdiff>0?-50:0),//xdiff 判断是为了能让滚动条股东到最右边
+                    top:0+document.querySelector('#shadowcontent').scrollTop,
                     width:centerSectionRect.width,
                     height:centerSectionRect.height,
                 }
                 let containInfo ={x:false,y:false};
                 if(!NodeElment.isAContainB(centerSectionPos, style,null,containInfo)){
                     if(!containInfo.x){
-                        document.querySelector('.shadow.content').scrollLeft+=xdiff>0?10:-10;
+                        document.querySelector('#shadowcontent').scrollLeft+=xdiff>0?10:-10;
                     }
                     if(!containInfo.y){
                         document.querySelector('#centerSection').scrollTop+=ydiff>0?10:-10;
