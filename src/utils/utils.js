@@ -51,3 +51,6 @@ export function getPositionByEditor(x,y){
     const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
     return {left:Math.round(x-editorRectInfo.left),top:Math.round(y-editorRectInfo.top)}
 }
+export function copyObject(obj){
+    return JSON.parse(JSON.stringify(obj))
+}

@@ -107,7 +107,7 @@ export default {
 
                         }
 
-                        if(!NodeElment.isAContainB(this.$store.state.stage,newpos)){
+                        if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,newpos)){
                             this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
                             return;
                         }
@@ -159,7 +159,7 @@ export default {
             component.style.top = lefttop.top
             component.style.left = lefttop.left
             component.id = generateID()
-            NodeElment.isAContainBResize(this.$store.state.stage,component.style,component.style)
+            NodeElment.isAContainBResize(this.$store.state.canvasStyleData,component.style,component.style)
             this.$store.commit('addComponent', { component })
             this.$store.commit('recordSnapshot')
         },

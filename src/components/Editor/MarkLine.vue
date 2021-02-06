@@ -13,6 +13,7 @@
 
 <script>
 import eventBus from '@/utils/eventBus'
+import {copyObject} from '@/utils/utils'
 import { mapState } from 'vuex'
 import { sin, cos } from '@/utils/translate'
 const defaultDiff = 3;
@@ -102,6 +103,7 @@ export default {
             const lines = this.$refs
             let components = this.componentData
             let curComponentStyle = this.translateComponentStyle(this.curComponent.style)
+             console.log('this.curComponent.style',copyObject(this.curComponent.style),copyObject(curComponentStyle));
             const curComponentHalfwidth = curComponentStyle.width / 2
             const curComponentHalfHeight = curComponentStyle.height / 2
             this.diff = dragdiff !== null?dragdiff:defaultDiff;
@@ -209,11 +211,15 @@ export default {
                         if (!condition.isNearly||!condition.lineNode){
                             return;
                         }
-                        // console.log(condition);
+
 
                         if(dragdiff===null){
                             //resize时不可以使用吸附功能
                             // 修改当前组件位移(吸附功能)
+                            console.log('setShapePosStyle',condition,rotate != 0,{
+                                key,
+                                value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
+                            },copyObject(this.curComponent.style));
                             this.$store.commit('setShapePosStyle', {
                                 key,
                                 value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
@@ -223,8 +229,10 @@ export default {
                 })
 
             })
+            console.log('重新获取this.curComponent.style',copyObject(this.curComponent.style));
             //重新获取
             curComponentStyle = this.translateComponentStyle(this.curComponent.style)
+
             components.forEach(component => {
                 if (component.id == this.curComponent.id) return;
             // console.log('components',components,component.style);

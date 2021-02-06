@@ -261,9 +261,10 @@ export default {
                 hasMove = true
                 pos.top = ydiff + startTop
                 pos.left = xdiff + startLeft
-                NodeElment.isAContainB(this.$store.state.stage,pos,pos)
+                NodeElment.isAContainB(this.$store.state.canvasStyleData,pos,pos)
 
                 // 修改当前组件样式
+                
                 this.$store.commit('setShapeStyle', pos)
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
                 // 如果不使用 $nextTick，吸附后将无法移动
@@ -410,7 +411,7 @@ export default {
                     curPoint,
                     symmetricPoint,
                 })
-                NodeElment.isAContainBResize(this.$store.state.stage,style,style)
+                NodeElment.isAContainBResize(this.$store.state.canvasStyleData,style,style)
                 this.$store.commit('setShapeStyle', style)
                 const startY = curPoint.y
                 const startX = curPoint.x

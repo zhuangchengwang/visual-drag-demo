@@ -5,10 +5,10 @@ function getProtype(object,key,defaultV){
 }
 function changePos(rec){
        let getBoundingClientRect={
-            x1:getProtype(rec,'x1',rec['left']),//x1 left
-            y1:getProtype(rec,'y1',rec['top']),//y1  top
-            x2:getProtype(rec,'x2',rec['left']+rec['width']),//x2 right
-            y2:getProtype(rec,'y2',rec['top']+rec['height']),//y2 bottom
+            x1:getProtype(rec,'x1',Number(rec['left'])),//x1 left
+            y1:getProtype(rec,'y1',Number(rec['top'])),//y1  top
+            x2:getProtype(rec,'x2',Number(rec['left'])+Number(rec['width'])),//x2 right
+            y2:getProtype(rec,'y2',Number(rec['top'])+Number(rec['height'])),//y2 bottom
         };
         return getBoundingClientRect;
 }
@@ -112,7 +112,7 @@ export function isAContainBResize(aNode_borderPosition_1, bNode_borderPosition_1
             }
             //down
             if(b_y1 + bNode_borderPosition_1.height > a_y2){
-               nearlyWhnearlyWh.height = a_y2-b_y1;
+               nearlyWh.height = a_y2-b_y1;
             }
             //left
             if(b_x1<a_x1){

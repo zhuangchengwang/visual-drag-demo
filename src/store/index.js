@@ -9,14 +9,10 @@ const store = new Vuex.Store({
     state: {
         editMode: 'edit', // 编辑器模式 edit read
         canvasStyleData: { // 页面全局数据
+            left:0,
+            top:0,
             width: 1000,
             height: 740,
-        },
-        stage:{
-          x1:0,
-          y1:0,
-          x2:1000,
-          y2:740,
         },
         componentData: [], // 画布组件数据
         curComponent: null,
@@ -82,7 +78,7 @@ const store = new Vuex.Store({
 
         setCanvasStyle(state, style) {
             state.canvasStyleData = style;
-            state.stage = {x1:0,y1:0,x2:style.width,y2:style.height}
+
 
         },
 
@@ -102,22 +98,22 @@ const store = new Vuex.Store({
 
 
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {
-            if (!isNaN(top)) curComponent.style.top = Math.round(top)
-            if (!isNaN(left)) curComponent.style.left = Math.round(left)
-            if (width) curComponent.style.width = Math.round(width)
-            if (height) curComponent.style.height = Math.round(height)
-            if (rotate) curComponent.style.rotate = Math.round(rotate)
+            if (!isNaN(top)) curComponent.style.top = Number(Math.round(top))
+            if (!isNaN(left)) curComponent.style.left = Number(Math.round(left))
+            if (width) curComponent.style.width = Number(Math.round(width))
+            if (height) curComponent.style.height = Number(Math.round(height))
+            if (rotate) curComponent.style.rotate = Number(Math.round(rotate))
         },
 
         setShapePosStyle({ curComponent }, { key, value }) {
             value = Math.round(value);
             if(key=='top'){
-                value = value<store.state.stage.y1?store.state.stage.y1:value;
+                value = value<store.state.canvasStyleData.height?store.state.canvasStyleData.height:value;
             }
             if(key=='left'){
-                value = value<store.state.stage.x1?store.state.stage.x1:value;
+                value = value<store.state.canvasStyleData.width?store.state.canvasStyleData.width:value;
             }
-            curComponent.style[key] = value
+            curComponent.style[key] = Number(value)
         },
 
         undo(state) {

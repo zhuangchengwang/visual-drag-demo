@@ -110,7 +110,7 @@ export default {
                 component.style.height = Math.abs(ydiff);
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
                 // 如果不使用 $nextTick，吸附后将无法移动
-                NodeElment.isAContainBResize(this.$store.state.stage,component.style,component.style)
+                NodeElment.isAContainBResize(this.$store.state.canvasStyleData,component.style,component.style)
             }
 
             const up = () => {

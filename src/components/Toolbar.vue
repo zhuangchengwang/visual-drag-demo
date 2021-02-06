@@ -3,7 +3,7 @@
         <div class="toolbar">
             <el-button @click="undo">撤消</el-button>
             <el-button @click="redo">重做</el-button>
-            <!-- <label for="input" class="insert">插入图片</label> -->
+            <label for="input" class="insert">插入图片</label>
             <input type="file" @change="handleFileChange" id="input" hidden />
             <el-button @click="preview" class="mgl10">预览</el-button>
             <el-button @click="save">保存</el-button>
@@ -18,12 +18,12 @@
                   :value="item.value">
                 </el-option>
             </el-select>
-           <!-- <div class="canvas-config">
+           <div class="canvas-config">
                 <span>画布大小</span>
                 <input v-model="canvasStyleData.width">
                 <span>*</span>
                 <input v-model="canvasStyleData.height">
-            </div> -->
+            </div>
            <el-checkbox  class="mgl10" v-model="isShadow" @change="isOpenShadow">开启辅助阴影</el-checkbox>
 
         </div>
