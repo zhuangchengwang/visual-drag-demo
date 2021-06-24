@@ -81,6 +81,7 @@ export default {
       })
     },
     methods: {
+        //使用ctrl 画矩形 功能
         handleMouseDownOnEditor(e){
             e.stopPropagation();
             if(!e.ctrlKey){
@@ -98,8 +99,10 @@ export default {
             component.style.width = 0
             component.style.height = 0
             component.id = generateID()
-            this.$store.commit('addComponent', { component })
+            let addCount = 0;
+            
             const move = (moveEvent) => {
+                
                 const curX = moveEvent.clientX
                 const curY = moveEvent.clientY
                 // curY - startY > 0 true 表示向下移动 false 表示向上移动
@@ -108,6 +111,11 @@ export default {
                 const ydiff = curY - startY
                 component.style.width = Math.abs(xdiff);
                 component.style.height = Math.abs(ydiff);
+                //只要长宽不等于0 就是已经画了一个矩形
+                if(!addCount && component.style.width && component.style.height){
+                    this.$store.commit('addComponent', { component })
+                    addCount++;
+                }
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
                 // 如果不使用 $nextTick，吸附后将无法移动
                 NodeElment.isAContainBResize(this.$store.state.canvasStyleData,component.style,component.style)

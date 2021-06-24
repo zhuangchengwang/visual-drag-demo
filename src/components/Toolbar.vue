@@ -83,10 +83,10 @@ export default {
         selectCanvasMode(v){
 
           if(v=='phone'){
-              this.$store.commit('setCanvasStyle',{width:375,height:740})
+              this.$store.commit('setCanvasStyle',{width:375,height:740,left:0,top:0})
           }
           if(v=='pc'){
-                this.$store.commit('setCanvasStyle',{width:1000,height:740})
+                this.$store.commit('setCanvasStyle',{width:1000,height:740,left:0,top:0})
             }
         },
         undo() {

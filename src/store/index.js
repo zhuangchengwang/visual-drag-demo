@@ -108,10 +108,10 @@ const store = new Vuex.Store({
         setShapePosStyle({ curComponent }, { key, value }) {
             value = Math.round(value);
             if(key=='top'){
-                value = value<store.state.canvasStyleData.height?store.state.canvasStyleData.height:value;
+                value = value>store.state.canvasStyleData.height?store.state.canvasStyleData.height:value;
             }
             if(key=='left'){
-                value = value<store.state.canvasStyleData.width?store.state.canvasStyleData.width:value;
+                value = value>store.state.canvasStyleData.width?store.state.canvasStyleData.width:value;
             }
             curComponent.style[key] = Number(value)
         },

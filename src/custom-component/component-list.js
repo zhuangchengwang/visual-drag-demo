@@ -1,5 +1,18 @@
 // 公共样式
 const commonStyle = {
+    width: 300,
+    height: 200,
+    borderWidth: 0,
+    borderStyle: 'solid',
+    borderColor: '',
+    borderRadius: '',
+    fontSize: '',
+    fontWeight: '',
+    lineHeight: '',
+    letterSpacing: 0,
+    textAlign: '',
+    color: '',
+    backgroundColor: '',
     rotate: '',
     opacity: 1,
 }
@@ -16,12 +29,7 @@ const list = [
         style: {
             width: 200,
             height: 33,
-            fontSize: 14,
-            fontWeight: 500,
-            lineHeight: '',
-            letterSpacing: 0,
-            textAlign: '',
-            color: '',
+
         },
     },
     {
@@ -34,16 +42,7 @@ const list = [
         style: {
             width: 100,
             height: 34,
-            borderWidth: '',
-            borderColor: '',
-            borderRadius: '',
-            fontSize: 14,
-            fontWeight: 500,
-            lineHeight: '',
-            letterSpacing: 0,
-            textAlign: '',
-            color: '',
-            backgroundColor: '',
+
         },
     },
     {
@@ -56,7 +55,6 @@ const list = [
         style: {
             width: 300,
             height: 200,
-            borderRadius: '',
         },
     },
     {
@@ -67,18 +65,8 @@ const list = [
         animations: [],
         events: {},
         style: {
-            width: 300,
+            width: 400,
             height: 200,
-            borderWidth: '',
-            borderColor: '',
-            borderRadius: '',
-            fontSize: '',
-            fontWeight: '',
-            lineHeight: '',
-            letterSpacing: 0,
-            textAlign: '',
-            color: '',
-            backgroundColor: '',
         },
     },
     {
@@ -91,13 +79,13 @@ const list = [
         style: {
             width: 456,
             height: 200,
-            borderRadius: '',
+
         },
     },
 ]
 
 list.forEach(item => {
-    item.style = { ...item.style, ...commonStyle }
+    item.style = { ...commonStyle , ...item.style}
 })
 
 export default list

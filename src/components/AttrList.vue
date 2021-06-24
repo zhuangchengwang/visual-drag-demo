@@ -15,6 +15,15 @@
                         :value="item.value"
                     ></el-option>
                 </el-select>
+
+                <el-select v-else-if="key == 'borderStyle'" v-model="curComponent.style[key]">
+                    <el-option
+                        v-for="item in borderStyleOpts"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    ></el-option>
+                </el-select>
                 <el-input type="number" v-else :min="0" :max="stage.width" v-model="curComponent.style[key]" />
             </el-form-item>
             <el-form-item label="内容" v-if="curComponent && !excludes.includes(curComponent.component)">
@@ -30,7 +39,7 @@ export default {
         return {
             excludes: ['Picture','VDiv','LayuiTab'], // 这些组件不显示内容
             predefineColors: [
-                      
+
                       '#f0f0f0',
                       '#ff4500',
                       '#ffffff',
@@ -62,6 +71,20 @@ export default {
                     value: 'right',
                 },
             ],
+            borderStyleOpts:[
+                {
+                    label: 'solid',
+                    value: 'solid',
+                },
+                {
+                    label: 'dotted',
+                    value: 'dotted',
+                },
+                {
+                    label: 'dashed',
+                    value: 'dashed',
+                },
+            ],
             map: {
                 left: 'x 坐标',
                 top: 'y 坐标',
@@ -70,6 +93,7 @@ export default {
                 color: '颜色',
                 backgroundColor: '背景色',
                 borderWidth: '边框宽度',
+                borderStyle:'边框样式',
                 borderColor: '边框颜色',
                 borderRadius: '边框半径',
                 fontSize: '字体大小',

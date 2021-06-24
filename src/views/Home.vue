@@ -106,8 +106,9 @@ export default {
                                 break;
 
                         }
-
+                        console.log("this.$store.state.canvasStyleData",this.$store.state.canvasStyleData,newpos)
                         if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,newpos)){
+                            
                             this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
                             return;
                         }

@@ -46,7 +46,7 @@ export default {
         eventBus.$on('unmove', () => {
             this.hideLine()
         })
-        // 监听元素移动和不移动的事件
+        // 监听元素伸缩事件
         eventBus.$on('resize', (isDownward, isRightward) => {
             // console.log('resize event');
             //dragdiff 设置为0,只是个人感觉 禁止吸附体验更好而已

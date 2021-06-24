@@ -223,6 +223,7 @@ export default {
                 }
             }
         },
+        //移动元素
         handleMouseDownOnShape(e) {
             if(e.ctrlKey){
                 e.preventDefault()
@@ -255,16 +256,17 @@ export default {
                 const xdiff = curX - startX
                 const ydiff = curY - startY
                 this.containerScoll(xdiff,ydiff,pos)
-                if(Math.abs(ydiff)<3&&Math.abs(xdiff)<3){
-                    return false;
-                }
+                // if(Math.abs(ydiff)<3&&Math.abs(xdiff)<3){
+                //     return false;
+                // }
                 hasMove = true
                 pos.top = ydiff + startTop
                 pos.left = xdiff + startLeft
+                //防止元素被移除画布之外
                 NodeElment.isAContainB(this.$store.state.canvasStyleData,pos,pos)
 
                 // 修改当前组件样式
-                
+
                 this.$store.commit('setShapeStyle', pos)
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
                 // 如果不使用 $nextTick，吸附后将无法移动
