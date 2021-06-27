@@ -38,7 +38,7 @@ const store = new Vuex.Store({
                 return
             }
 
-            const data = state.copyData.data
+            let data = deepCopy(state.copyData.data)
 
             if (isMouse) {
                 data.style.top = state.menuTop
@@ -51,7 +51,12 @@ const store = new Vuex.Store({
             data.id = generateID()
             store.commit('addComponent', { component: data })
             store.commit('recordSnapshot')
-            state.copyData = null
+            // state.copyData = null
+            state.copyData = {
+                data: deepCopy(data),
+                index: data.id,
+            }
+
         },
 
         cut(state) {

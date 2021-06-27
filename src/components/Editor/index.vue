@@ -126,6 +126,7 @@ export default {
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
                  this.ctrlclick = false;
+                 this.$store.commit('sort')
             }
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)
