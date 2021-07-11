@@ -48,7 +48,7 @@ import generateID from '@/utils/generateID'
 import toast from '@/utils/toast'
 import { mapState } from 'vuex'
 import Preview from '@/components/Editor/Preview'
-
+import * as utils from '@/utils/utils'
 export default {
     components: { Preview },
     data() {
@@ -74,7 +74,24 @@ export default {
     ]),
     methods: {
         crateCode(){
+          this.$store.commit("getBoundingClientRect")
           console.log(this.componentData);
+           utils.ajax({
+                   url:"https://dd2.xi13n.cn/api/v1/site/crate-from-doms",
+                   type:'post',
+                   data:{componentData:JSON.stringify(this.componentData),canvasStyleData:JSON.stringify(this.canvasStyleData)},
+                   dataType:'json',
+                   timeout:10000,
+                   contentType:"application/json",
+                   success:function(data){
+           　　　　　　  console.log(data);
+                        // window.open("https://dd2.xi13n.cn/a1.html","_blank");
+                   },
+                   //异常处理
+                   error:function(e){
+                       console.log(e);
+                   }
+               })
         },
         isOpenShadow(v){
 

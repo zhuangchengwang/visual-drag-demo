@@ -8,6 +8,8 @@ export default function getStyle(style, filter = []) {
         'borderWidth',
         'letterSpacing',
         'borderRadius',
+        'lineHeight',
+        // 'fontWeight',这个没有单位
     ]
 
     const result = {}

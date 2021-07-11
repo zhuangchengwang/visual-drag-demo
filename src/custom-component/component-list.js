@@ -3,7 +3,7 @@ const commonStyle = {
     width: 300,
     height: 200,
     borderWidth: 0,
-    borderStyle: 'solid',
+    borderStyle: 'none',
     borderColor: '',
     borderRadius: '',
     fontSize: '',
@@ -12,9 +12,9 @@ const commonStyle = {
     letterSpacing: 0,
     textAlign: '',
     color: '',
-    backgroundColor: '',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
     rotate: '',
-    opacity: 1,
+    // opacity: 1,
 }
 
 // 编辑器左侧组件列表
@@ -32,6 +32,7 @@ const list = [
 
         },
     },
+    
     {
         component: 'v-button',
         label: '按钮',
@@ -70,6 +71,18 @@ const list = [
         },
     },
     {
+        component: 'v-span',
+        label: '文本',
+        propValue: '这是一个文本,超过宽度自动换行和自动隐藏',
+        icon: 'el-icon-edit',
+        animations: [],
+        events: {},
+        style: {
+            width: 100,
+            height: 21,
+        },
+    },
+    {
         component: 'LayuiTab',
         label: 'LayuiTab',
         icon: 'el-icon-picture',
@@ -86,6 +99,9 @@ const list = [
 
 list.forEach(item => {
     item.style = { ...commonStyle , ...item.style}
+    item.drag = {startLeft:null,startTop:null}
+    //生成代码的时候会计算一遍
+    item.boundingClientRect={}
 })
 
 export default list

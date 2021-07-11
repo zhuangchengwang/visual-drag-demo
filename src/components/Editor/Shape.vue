@@ -10,6 +10,22 @@
             :key="index"
             :style="getPointStyle(item)">
         </div>
+        <div v-show="element === curComponent " class="shape-x-line" :style="getXyLineStyle('x')">
+            {{xyLineStyle.width}}
+             <div class="content" ></div>
+        </div>
+        <div v-show="element === curComponent" class="shap-y-line" :style="getXyLineStyle('y')">
+            {{xyLineStyle.height}}
+            <div class="content" ></div>
+        </div>
+        <div v-show="element === curComponent " class="shape-x2-line" :style="getXyLineStyle2('x')">
+            {{xyLineStyle2.width}}
+            <div class="content" ></div>
+        </div>
+        <div v-show="element === curComponent" class="shap-y2-line" :style="getXyLineStyle2('y')">
+            {{xyLineStyle2.height}}
+            <div class="content" ></div>
+        </div>
         <slot></slot>
     </div>
 </template>
@@ -65,10 +81,15 @@ export default {
                 { start: 293, end: 338, cursor: 'w' },
             ],
             cursors: {},
+            xyLineStyle:{width:"",height:""},
+            xyLineStyle2:{width:"",height:""},
         }
     },
     computed: mapState([
         'curComponent',
+        'curComponentList',
+        'componentData',
+        'canvasStyleData'
     ]),
     mounted() {
         eventBus.$on('runAnimation', () => {
@@ -160,7 +181,105 @@ export default {
 
             return style
         },
+        getXyLineStyle(type){
+            let componentData = this.componentData;
+            utils.changeJsonValue(this.defaultStyle) ;
+            let curstyle =this.defaultStyle;
+            let dis = 100000;
+            let curcom = null;
+            let mindis = 0;
+            if(type=='x'){
+                for(let i in componentData){
+                    curcom = componentData[i];
+                    utils.changeJsonValue(curcom.style)
+                    let dd1 = curstyle.left-curcom.style.left;
+                    let dd2 = curstyle.left-curcom.style.left-curcom.style.width;
+                    //对于x方向的距离线条 ，如果不在同一行的，就过滤掉，y方向的暂时不考虑
+                    if(curcom.style.top>curstyle.top+curstyle.height || curcom.style.top+curcom.style.height<curstyle.top){
+                        continue;
+                    }
+                    if(dd1>mindis  && dd1 <dis){
+                        dis = dd1;
+                    }
+                    if(dd2>mindis && dd2 <dis){
+                        dis = dd2;
+                    }
+                }
+                if(dis==100000){
+                    dis = curstyle.left;
+                }
+                this.xyLineStyle.width = `${dis}px`
+                return {left: `-${dis}px`,width: `${dis}px`}
+            }else{
+                for(let i in componentData){
+                    curcom = componentData[i];
+                    utils.changeJsonValue(curcom.style)
+                    let dd1 = curstyle.top - curcom.style.top;
+                    let dd2 = curstyle.top-curcom.style.top-curcom.style.height;
+                    if(dd1>mindis && dd1 <dis){
+                        dis = dd1;
+                    }
+                    if(dd2>mindis && dd2 <dis){
+                        dis = dd2;
+                    }
+                }
+                if(dis==100000){
+                    dis = curstyle.top;
+                }
+                this.xyLineStyle.height = `${dis}px`
+                return {top: `-${dis}px`,height: `${dis}px`,lineHeight: `${dis}px`,textIndent:"5px"}
+            }
+        },
 
+        getXyLineStyle2(type){
+            let componentData = this.componentData;
+            utils.changeJsonValue(this.defaultStyle) ;
+            let curstyle =this.defaultStyle;
+            let dis = 100000;
+            let curcom = null;
+            let mindis = 0;
+            if(type=='x'){
+                for(let i in componentData){
+                    curcom = componentData[i];
+                    utils.changeJsonValue(curcom.style)
+                    let dd1 = (curcom.style.left+curcom.style.width)-(curstyle.left+curstyle.width);
+                    let dd2 = curcom.style.left-(curstyle.left+curstyle.width);
+                    //对于x方向的距离线条 ，如果不在同一行的，就过滤掉，y方向的暂时不考虑
+                    if(curcom.style.top>curstyle.top+curstyle.height || curcom.style.top+curcom.style.height<curstyle.top){
+                        continue;
+                    }
+                    if(dd1>mindis  && dd1 <dis){
+                        dis = dd1;
+                    }
+                    if(dd2>mindis && dd2 <dis){
+                        dis = dd2;
+                    }
+                }
+                if(dis==100000){
+                    dis = this.canvasStyleData.left+this.canvasStyleData.width - (curstyle.left+curstyle.width);
+                }
+                this.xyLineStyle2.width = `${dis}px`
+                return {right: `-${dis}px`,width: `${dis}px`}
+            }else{
+                for(let i in componentData){
+                    curcom = componentData[i];
+                    utils.changeJsonValue(curcom.style)
+                    let dd1 = curcom.style.top-(curstyle.top +curstyle.height);
+                    let dd2 = (curcom.style.top+curcom.style.height)-(curstyle.top +curstyle.height);
+                    if(dd1>mindis && dd1 <dis){
+                        dis = dd1;
+                    }
+                    if(dd2>mindis && dd2 <dis){
+                        dis = dd2;
+                    }
+                }
+                if(dis==100000){
+                    dis = this.canvasStyleData.top+this.canvasStyleData.height - (curstyle.top +curstyle.height);
+                }
+                this.xyLineStyle2.height = `${dis}px`
+                return {bottom: `-${dis}px`,height: `${dis}px`,lineHeight: `${dis}px`,textIndent:"5px"}
+            }
+        },
         getCursor() {
             const { angleToCursor, initialAngle, pointList, curComponent } = this
             const rotate = (curComponent.style.rotate + 360) % 360 // 防止角度有负数，所以 + 360
@@ -233,41 +352,69 @@ export default {
                 e.preventDefault()
             }
             // console.log("handleMouseDownOnShape",e);
-            // e.stopPropagation()
+            e.stopPropagation()
+            let isclear = false;
+            if(e.shiftKey){
+                if(this.curComponent){
+                    //追加最近一个选中元素（这样的话，当前有一个选中元素，然后你再按住shift键，可以把当前的选中，给添加进来，体验更好）
+                  this.$store.commit('setCurComponentList', { component: this.curComponent})
+                }
+
+            }else{
+                //清空(<2这个判断在于优化操作，当选中了至少2个元素后，可以不用再按住shift，进行整体移动或新增选中其他元素等操作)
+                if(this.curComponentList.length<2)
+                    isclear = true;
+            }
+            //设置当前选中元素
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
+            this.$store.commit('setCurComponentList', { component: this.element,isclear:isclear})
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
-
-            const pos = { ...this.defaultStyle }
-
-            utils.changeJsonValue(pos)
-            const startY = e.clientY
-            const startX = e.clientX
+            const curstyle = { ...this.defaultStyle }
+            utils.changeJsonValue(curstyle)
             // 如果直接修改属性，值的类型会变为字符串，所以要转为数值型
-            const startTop = Number(pos.top)
-            const startLeft = Number(pos.left)
-
+            let minRec;
+            if(this.curComponentList.length>0){
+                for(let i in this.curComponentList){
+                    this.curComponentList[i].drag.startTop =  Number(this.curComponentList[i].style.top)
+                    this.curComponentList[i].drag.startLeft =  Number(this.curComponentList[i].style.left)
+                }
+                minRec = NodeElment.getMinimumRec2(this.curComponentList);
+            }
+            minRec.startTop = Number(minRec.top);
+            minRec.startLeft = Number(minRec.left);
             // 如果元素没有移动，则不保存快照
             let hasMove = false
+            const startY = e.clientY
+            const startX = e.clientX
             const move = (moveEvent) => {
                 const curX = moveEvent.clientX
                 const curY = moveEvent.clientY
                 // curY - startY > 0 true 表示向下移动 false 表示向上移动
                 // curX - startX > 0 true 表示向右移动 false 表示向左移动
-                const xdiff = curX - startX
-                const ydiff = curY - startY
-                this.containerScoll(xdiff,ydiff,pos)
+                let xdiff = curX - startX
+                let ydiff = curY - startY
+                this.containerScoll(xdiff,ydiff,curstyle)
                 // if(Math.abs(ydiff)<3&&Math.abs(xdiff)<3){
                 //     return false;
                 // }
                 hasMove = true
-                pos.top = ydiff + startTop
-                pos.left = xdiff + startLeft
-                //防止元素被移除画布之外
-                NodeElment.isAContainB(this.$store.state.canvasStyleData,pos,pos)
+                minRec.top = ydiff +  minRec.startTop;
+                minRec.left = xdiff + minRec.startLeft;
+                //判断是否越界，多个元素一起拖拽时
+                if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec,minRec)){
+                    //重新计算横纵坐标间隔，防止元素被移除画布之外
+                    ydiff = minRec.top - minRec.startTop;
+                    xdiff = minRec.left - minRec.startLeft;
+                    // return;
+                }
 
-                // 修改当前组件样式
+                if(this.curComponentList.length>0){
+                    for(let i in this.curComponentList){
+                        this.curComponentList[i].style.top = ydiff + this.curComponentList[i].drag.startTop
+                        this.curComponentList[i].style.left = xdiff + this.curComponentList[i].drag.startLeft
+                    }
+                }
 
-                this.$store.commit('setShapeStyle', pos)
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
                 // 如果不使用 $nextTick，吸附后将无法移动
                 this.$nextTick(() => {
@@ -279,6 +426,7 @@ export default {
             }
 
             const up = () => {
+
                 hasMove && this.$store.commit('recordSnapshot')
                 // 触发元素停止移动事件，用于隐藏标线
                 eventBus.$emit('unmove')
@@ -464,6 +612,88 @@ export default {
     width: 8px;
     height: 8px;
     border-radius: 50%;
+
+}
+.shape-x-line{
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ff0000;
+    height: 0px;
+    left:0px;
+    text-align: center;
+    color: red;
+    font-size: 12px;
+    top:10px;
+    .content
+    {
+            position: absolute;
+            left: -3px;
+            top: -6px;
+            border: 1px solid #ff0000;
+            height: 12px;
+
+    }
+}
+.shap-y-line{
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ff0000;
+    width: 0px;
+    top:0px;
+    text-align: center;
+    color: red;
+    font-size: 12px;
+    left:10px;
+    .content
+    {
+            position: absolute;
+            top: -3px;
+            left: -6px;
+            border: 1px solid #ff0000;
+            width: 12px;
+
+    }
+}
+
+.shape-x2-line{
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ff0000;
+    height: 0px;
+    right:0px;
+    text-align: center;
+    color: red;
+    font-size: 12px;
+    bottom:10px;
+    .content
+    {
+            position: absolute;
+            right: -3px;
+            top: -6px;
+            border: 1px solid #ff0000;
+            height: 12px;
+
+    }
+}
+.shap-y2-line{
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ff0000;
+    width: 0px;
+    bottom:0px;
+    text-align: center;
+    color: red;
+    font-size: 12px;
+    right:10px;
+    .content
+    {
+            position: absolute;
+            bottom: -3px;
+            left: -6px;
+            border: 1px solid #ff0000;
+            width: 12px;
+    
+    }
 }
 .el-icon-refresh-right {
     position: absolute;

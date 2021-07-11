@@ -11,7 +11,7 @@
                 :defaultStyle="item.style"
                 :style="getShapeStyle(item.style)"
                 :key="item.id"
-                :active="item === curComponent"
+                :active="item === curComponent ||curComponentList.includes(item)"
                 :element="item"
                 :index="index"
             >
@@ -37,6 +37,7 @@
             <ContextMenu />
             <!-- 标线 -->
             <MarkLine />
+            <div class="selectSome" :style="selectSomeStyle"></div>
         </div>
     </div>
 </template>
@@ -61,13 +62,15 @@ export default {
     },
     data(){
         return {
-            ctrlclick:false
+            ctrlclick:false,
+            selectSomeStyle:{left:"-0px",top:"-0px",width:"0px",height:"0px",borderWidth:"0px"}
         }
     },
     components: { Shape, ContextMenu, MarkLine },
     computed: mapState([
         'componentData',
         'curComponent',
+        'curComponentList',
         'canvasStyleData',
     ]),
     mounted() {
@@ -81,18 +84,79 @@ export default {
       })
     },
     methods: {
-        //使用ctrl 画矩形 功能
-        handleMouseDownOnEditor(e){
-            e.stopPropagation();
-            if(!e.ctrlKey){
-                return;
+        selectSomeHandle(e){
+
+            const startY = e.clientY
+            const startX = e.clientX
+            let {left,top} = getPositionByEditor(e.clientX,e.clientY)
+            let left2 = left;
+            let top2 = top;
+            let xdiff = 0;
+            let ydiff = 0;
+            this.selectSomeStyle.left = `${left}px`
+            this.selectSomeStyle.top = `${top}px`
+            this.selectSomeStyle.borderWidth="1px"
+            const move = (moveEvent) => {
+
+                const curX = moveEvent.clientX
+                const curY = moveEvent.clientY
+                // curY - startY > 0 true 表示向下移动 false 表示向上移动
+                // curX - startX > 0 true 表示向右移动 false 表示向左移动
+                xdiff = curX - startX
+                ydiff = curY - startY
+                if(xdiff<0){
+
+                    left2 = left+xdiff;
+                    this.selectSomeStyle.left = `${left2}px`
+                }
+                if(ydiff<0){
+                    top2 =top+ydiff;
+                    this.selectSomeStyle.top = `${top2}px`
+                }
+                xdiff = Math.abs(xdiff)
+                ydiff = Math.abs(ydiff)
+
+
+                this.selectSomeStyle.width = `${xdiff}px`;
+                this.selectSomeStyle.height = `${ydiff}px`;
+
             }
 
-            this.$store.commit('setCurComponent', { component: null, index: null })
+            const up = () => {
+                for(let i in this.componentData){
+                    let comp = this.componentData[i].style;
+                    console.log("ydiff,xdiff",ydiff,xdiff)
+                    if(comp.top+comp.height<=top2 || comp.left+comp.width<=left2 ||comp.top >= top2+ydiff || comp.left >= left2+xdiff){
+
+                        continue;
+                    }
+
+                    this.$store.commit('setCurComponentList', { component: this.componentData[i]})
+                }
+                this.selectSomeStyle={left:"-0px",top:"-0px",width:"0px",height:"0px"}
+                // 触发元素停止移动事件，用于隐藏标线
+                document.removeEventListener('mousemove', move)
+                document.removeEventListener('mouseup', up)
+
+            }
+            document.addEventListener('mousemove', move)
+            document.addEventListener('mouseup', up)
+        },
+        //使用ctrl 画矩形 功能
+        handleMouseDownOnEditor(e){
+            console.log("index.vue handleMouseDownOnEditor e.stopPropagation e.preventDefault")
+            e.stopPropagation();
+            e.preventDefault()
+
+            if(!e.ctrlKey){
+                this.selectSomeHandle(e);
+                return;
+            }
+            // this.$store.commit('setCurComponent', { component: null, index: null })
             const startY = e.clientY
             const startX = e.clientX
             const component = deepCopy(componentList[3])//div
-            const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
+            // const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
             let lefttop = getPositionByEditor(e.clientX,e.clientY)
             component.style.left = lefttop.left
             component.style.top = lefttop.top
@@ -100,9 +164,9 @@ export default {
             component.style.height = 0
             component.id = generateID()
             let addCount = 0;
-            
+
             const move = (moveEvent) => {
-                
+
                 const curX = moveEvent.clientX
                 const curY = moveEvent.clientY
                 // curY - startY > 0 true 表示向下移动 false 表示向上移动
@@ -185,6 +249,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.selectSome{
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    top:0px;
+    left: 0px;
+    border-width: 0px;
+    border-style: dashed;
+    border-color: #999;
+}
 .contentEditor{
     padding: 10px;
     min-width: 1000px;

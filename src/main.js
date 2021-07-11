@@ -9,6 +9,8 @@ import '@/styles/animate.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/styles/reset.css'
 import _ from 'lodash'
+// import axios from 'axios'; // 引入axios
+// Vue.prototype.axios = axios
 Vue.prototype._ = _
 Vue.use(ElementUI, { size: 'small' })
 Vue.config.productionTip = false

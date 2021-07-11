@@ -59,6 +59,7 @@ export default {
     computed: mapState([
         'componentData',
         'curComponent',
+        'curComponentList'
     ]),
     created() {
         this.restore()
@@ -70,7 +71,7 @@ export default {
             this.isShadow = v;
         },
         listenCopyAndPaste() {
-            const ctrlKey = 17, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
+            const shiftKey = 16,ctrlKey = 17, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
 
 
             window.onkeydown = (e) => {
@@ -85,34 +86,56 @@ export default {
                     this.$store.commit('cut')
                 }else if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
                     e.preventDefault();
-                    if(this.$store.state.curComponent){
-                        let newpos = JSON.parse(JSON.stringify(this.$store.state.curComponent.style));
+
+                    if(this.curComponentList.length>0){
+                        // let newpos = JSON.parse(JSON.stringify(this.$store.state.curComponent.style));
+                        // this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
+                        let minRec = NodeElment.getMinimumRec2(this.curComponentList);
+
                         switch(e.keyCode){
                             case 37:
                                 //左
-                                newpos.left--;
+                                minRec.left--;
+                                if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                    break;
+                                }
+                                for(let i in this.curComponentList){
+                                    this.curComponentList[i].style.left--;
+                                }
                                 break;
                             case 38:
                                 //上
-                                newpos.top--;
+                                minRec.top--;
+                                if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                    break;
+                                }
+                                for(let i in this.curComponentList){
+                                    this.curComponentList[i].style.top--;
+                                }
                                 break;
                             case 39:
                                 //右
-                                newpos.left++;
+                                minRec.left++;
+                                if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                    break;
+                                }
+                                for(let i in this.curComponentList){
+                                    this.curComponentList[i].style.left++;
+                                }
                                 break;
                             case 40:
                                 //下
-                                newpos.top++;
+                                minRec.top++;
+                                if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                    break;
+                                }
+                                for(let i in this.curComponentList){
+                                    this.curComponentList[i].style.top++;
+                                }
                                 break;
 
                         }
-                        console.log("this.$store.state.canvasStyleData",this.$store.state.canvasStyleData,newpos)
-                        if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,newpos)){
-                            
-                            this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
-                            return;
-                        }
-                        this.$store.commit('setShapeStyle', newpos)
+                        // this.$store.commit('setShapeStyle', newpos)
                         eventBus.$emit('keymove', e.keyCode==40, e.keyCode==39)
 
                     }
@@ -171,14 +194,17 @@ export default {
         },
 
         deselectCurComponent(e) {
-            // console.log(e);
+            //代码移入markline.vue文件中了
+            // console.log("home.vue deselectCurComponent",e);
             //加上这个if是因为(先前为了使用layuitab可以被点击切换,允许事件冒泡,结果导致,组件选中后马上被取消,因为冒泡会到这里来)
             //然而,也因此导致了一个问题:右键菜单置顶置地功能无法及时响应,因为要想及时响应就必须取消选中
-            if(e.target.className==='mark-line'||e.target.className==='lic'){
+            
+            // if(e.target.className==='mark-line'||e.target.className==='lic'){
 
-               this.$store.commit('setCurComponent', { component: null, index: null })
-            }
-            this.$store.commit('hideContexeMenu')
+            //    this.$store.commit('setCurComponent', { component: null, index: null })
+            //    this.$store.commit('clearCurComponentList')
+            // }
+            // this.$store.commit('hideContexeMenu')
         },
     },
 }

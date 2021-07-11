@@ -11,6 +11,7 @@ const components2 = {
     VText: '',
     VButton: '',
     VDiv: '',
+    VSpan: '',
     LayuiTab: 'layui/',
 }
 // components.forEach(key => {

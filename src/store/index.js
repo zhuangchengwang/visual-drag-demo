@@ -17,6 +17,7 @@ const store = new Vuex.Store({
         componentData: [], // 画布组件数据
         curComponent: null,
         curComponentIndex: null,
+        curComponentList:[],
         snapshotData: [], // 编辑器快照数据
         snapshotIndex: -1, // 快照索引
         menuTop: 0, // 右击菜单数据
@@ -25,6 +26,15 @@ const store = new Vuex.Store({
         copyData: null, // 复制粘贴剪切
     },
     mutations: {
+        getBoundingClientRect(state){
+            for(let i in state.componentData){
+                let cod = state.componentData[i];
+                cod.boundingClientRect.left = cod.style.left;
+                cod.boundingClientRect.right = cod.style.left+cod.style.width;
+                cod.boundingClientRect.top = cod.style.top;
+                cod.boundingClientRect.bottom = cod.style.top+cod.style.height;
+            }
+        },
         copy(state) {
             state.copyData = {
                 data: deepCopy(state.curComponent),
@@ -101,6 +111,21 @@ const store = new Vuex.Store({
             state.curComponentIndex = index
         },
 
+        setCurComponentList(state, { component, isclear }) {
+            if(isclear){
+                Vue.set(state, 'curComponentList', [])
+            }
+            for(let c in state.curComponentList){
+                if(component.id === state.curComponentList[c].id){
+                    return;
+                }
+            }
+            state.curComponentList.push(component)
+        },
+        clearCurComponentList(state) {
+            // state.curComponentList.splice(0,state.curComponentList.length);
+             Vue.set(state, 'curComponentList', [])
+        },
 
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {
             if (!isNaN(top)) curComponent.style.top = Number(Math.round(top))

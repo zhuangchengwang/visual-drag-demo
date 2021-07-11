@@ -48,6 +48,7 @@ export function isAContainB(aNode_borderPosition_1, bNode_borderPosition_1,nearl
             return true;
         }
         if(nearlyPos){
+            // nearlyPos = bNode_borderPosition_1;
             if(b_x1<a_x1){
                nearlyPos.left = a_x1;
             }
@@ -127,4 +128,51 @@ export function isAContainBResize(aNode_borderPosition_1, bNode_borderPosition_1
 
         }
         return false;
+}
+
+export function getMinimumRec(nodes){
+    let x1=10000000;
+    let y1=10000000;
+    let x2=0;
+    let y2=0;
+    for(let i in nodes){
+        let node = nodes[i];
+        let borderPosition = changePos(node.style);
+        if(borderPosition['x1']<x1){
+           x1 = borderPosition['x1'];
+        }
+        if(borderPosition['y1']<y1){
+            y1 = borderPosition['y1'];
+        }
+        if(borderPosition['x2']>x2){
+            x2 = borderPosition['x2'];
+        }
+        if(borderPosition['y2']>y2){
+            y2 = borderPosition['y2'];
+        }
+    }
+    return {'x1':x1,'x2':x2,'y1':y1,'y2':y2};
+}
+export function getMinimumRec2(nodes){
+    let x1=10000000;
+    let y1=10000000;
+    let x2=0;
+    let y2=0;
+    for(let i in nodes){
+        let node = nodes[i];
+        let borderPosition = changePos(node.style);
+        if(borderPosition['x1']<x1){
+           x1 = borderPosition['x1'];
+        }
+        if(borderPosition['y1']<y1){
+            y1 = borderPosition['y1'];
+        }
+        if(borderPosition['x2']>x2){
+            x2 = borderPosition['x2'];
+        }
+        if(borderPosition['y2']>y2){
+            y2 = borderPosition['y2'];
+        }
+    }
+    return {'top':y1,'left':x1,'width':x2-x1,'height':y2-y1};
 }
