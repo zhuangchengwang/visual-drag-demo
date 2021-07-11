@@ -5,6 +5,7 @@
             @mousedown="handleMouseDownOnEditor"
             :class="{ edit: isEdit,crosshair:openCustomRectangleStatus }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
             @contextmenu="handleContextMenu"
+
         >
             <!--页面组件列表展示-->
             <Shape v-for="(item, index) in componentData"
@@ -62,7 +63,7 @@ export default {
     },
     data(){
         return {
-             
+
             selectSomeStyle:{left:"-0px",top:"-0px",width:"0px",height:"0px",borderWidth:"0px"}
         }
     },
@@ -85,6 +86,7 @@ export default {
       // })
     },
     methods: {
+
         selectSomeHandle(e){
 
             const startY = e.clientY
@@ -153,6 +155,7 @@ export default {
                 this.selectSomeHandle(e);
                 return;
             }
+            
             // this.$store.commit('setCurComponent', { component: null, index: null })
             const startY = e.clientY
             const startX = e.clientX
@@ -190,8 +193,8 @@ export default {
                 // 触发元素停止移动事件，用于隐藏标线
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
-                 this.ctrlclick = false;
                  this.$store.commit('sort')
+                 
             }
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)

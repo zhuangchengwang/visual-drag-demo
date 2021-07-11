@@ -1,5 +1,6 @@
 <template>
-    <div class="mark-line" @mousedown="deselectCurComponent">
+    <div id="mark-line" class="mark-line" @mousedown="deselectCurComponent" tabindex="0">
+
         <div
             v-for="line in lines"
             :key="line"
@@ -16,6 +17,7 @@ import eventBus from '@/utils/eventBus'
 import {copyObject} from '@/utils/utils'
 import { mapState } from 'vuex'
 import { sin, cos } from '@/utils/translate'
+import * as NodeElment from '@/utils/NodeElment'
 const defaultDiff = 4;
 export default {
     data() {
@@ -35,6 +37,7 @@ export default {
     computed: mapState([
         'curComponent',
         'componentData',
+        'curComponentList'
     ]),
     mounted() {
         // 监听元素移动和不移动的事件
@@ -67,10 +70,100 @@ export default {
             this.hideLine()
         })
     },
-    methods: {
+    created() {
+      this.$nextTick(()=>{
+          const EventContiner = document.querySelector('#mark-line');
+          const shiftKey = 16,ctrlKey = 17,altKey=18, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
+          EventContiner.addEventListener('keydown', (e) => {
+             e.preventDefault();
+             e.stopPropagation()
+             console.log("keydown",e)
+             if(e.keyCode == altKey){
+                 this.$store.commit("setOpenCustomRectangleStatus",1)
+                 // eventBus.$emit('openCustomRectangle');
+             }
+             if (e.ctrlKey && e.keyCode == cKey) {
+                 this.$store.commit('copy')
+             } else if (e.ctrlKey  && e.keyCode == vKey) {
+                 this.$store.commit('paste')
+             } else if (e.ctrlKey  && e.keyCode == xKey) {
+                 this.$store.commit('cut')
+             }else if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
 
+
+
+                 if(this.curComponentList.length>0){
+                     // let newpos = JSON.parse(JSON.stringify(this.$store.state.curComponent.style));
+                     // this.$message.error('越界啦!,元素移动时不可以超出画布大小哦!');
+                     let minRec = NodeElment.getMinimumRec2(this.curComponentList);
+
+                     switch(e.keyCode){
+                         case 37:
+                             //左
+                             minRec.left--;
+                             if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                 break;
+                             }
+                             for(let i in this.curComponentList){
+                                 this.curComponentList[i].style.left--;
+                             }
+                             break;
+                         case 38:
+                             //上
+                             minRec.top--;
+                             if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                 break;
+                             }
+                             for(let i in this.curComponentList){
+                                 this.curComponentList[i].style.top--;
+                             }
+                             break;
+                         case 39:
+                             //右
+                             minRec.left++;
+                             if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                 break;
+                             }
+                             for(let i in this.curComponentList){
+                                 this.curComponentList[i].style.left++;
+                             }
+                             break;
+                         case 40:
+                             //下
+                             minRec.top++;
+                             if(!NodeElment.isAContainB(this.$store.state.canvasStyleData,minRec)){
+                                 break;
+                             }
+                             for(let i in this.curComponentList){
+                                 this.curComponentList[i].style.top++;
+                             }
+                             break;
+
+                     }
+                     // this.$store.commit('setShapeStyle', newpos)
+                     eventBus.$emit('keymove', e.keyCode==40, e.keyCode==39)
+
+                 }
+             }
+          });
+          EventContiner.addEventListener('keyup', (e) => {
+             console.log("keyup",e)
+             if(e.keyCode == altKey){
+                 // eventBus.$emit('closeCustomRectangle');
+                 this.$store.commit("setOpenCustomRectangleStatus",0)
+             }
+             if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
+                 setTimeout(()=>{
+                      eventBus.$emit('unmove')
+                 },400)
+             }
+          });
+      })
+    },
+    methods: {
         deselectCurComponent(e) {
                 console.log("markline.vue deselectCurComponent",e);
+                document.querySelector('#mark-line').focus()
                 //加上这个if是因为(先前为了使用layuitab可以被点击切换,允许事件冒泡,结果导致,组件选中后马上被取消,因为冒泡会到这里来)
                 //然而,也因此导致了一个问题:右键菜单置顶置地功能无法及时响应,因为要想及时响应就必须取消选中
                 this.$store.commit('setCurComponent', { component: null, index: null })
@@ -78,6 +171,19 @@ export default {
                 this.$store.commit('hideContexeMenu')
         },
 
+        listenCopyAndPaste() {
+            const shiftKey = 16,ctrlKey = 17,altKey=18, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
+            window.onkeydown = (e) => {
+        		console.log("home.vue ",e,e.keyCode)
+
+
+            }
+
+            window.onkeyup = (e) => {
+
+
+            }
+        },
         hideLine() {
             Object.keys(this.lineStatus).forEach(line => {
                 this.lineStatus[line] = false
@@ -434,6 +540,7 @@ export default {
 <style lang="scss" scoped>
 .mark-line {
     height: 100%;
+    outline: none;
 }
 .line {
     background: #59c7f9;

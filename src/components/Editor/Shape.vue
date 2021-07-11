@@ -10,19 +10,19 @@
             :key="index"
             :style="getPointStyle(item)">
         </div>
-        <div v-show="element === curComponent " class="shape-x-line" :style="getXyLineStyle('x')">
+        <div v-show="element === curComponent && isMouseDownOnShape " class="shape-x-line" :style="getXyLineStyle('x')">
             {{xyLineStyle.width}}
              <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent" class="shap-y-line" :style="getXyLineStyle('y')">
+        <div v-show="element === curComponent && isMouseDownOnShape " class="shap-y-line" :style="getXyLineStyle('y')">
             {{xyLineStyle.height}}
             <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent " class="shape-x2-line" :style="getXyLineStyle2('x')">
+        <div v-show="element === curComponent && isMouseDownOnShape  " class="shape-x2-line" :style="getXyLineStyle2('x')">
             {{xyLineStyle2.width}}
             <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent" class="shap-y2-line" :style="getXyLineStyle2('y')">
+        <div v-show="element === curComponent && isMouseDownOnShape " class="shap-y2-line" :style="getXyLineStyle2('y')">
             {{xyLineStyle2.height}}
             <div class="content" ></div>
         </div>
@@ -59,6 +59,7 @@ export default {
     },
     data() {
         return {
+            isMouseDownOnShape:false,
             pointList: ['lt', 't', 'rt', 'r', 'rb', 'b', 'lb', 'l'], // 八个方向
             initialAngle: { // 每个点对应的初始角度
                 lt: 0,
@@ -349,6 +350,8 @@ export default {
         },
         //移动元素
         handleMouseDownOnShape(e) {
+            this.isMouseDownOnShape = true;
+            document.querySelector('#mark-line').focus()
             //开启自定义矩形功能，
             if(this.openCustomRectangleStatus){
                 e.preventDefault()
@@ -432,7 +435,7 @@ export default {
             }
 
             const up = () => {
-
+                this.isMouseDownOnShape = false;
                 hasMove && this.$store.commit('recordSnapshot')
                 // 触发元素停止移动事件，用于隐藏标线
                 eventBus.$emit('unmove')
@@ -454,7 +457,8 @@ export default {
         },
 
         handleMouseDownOnPoint(point, e) {
-            if(e.ctrlKey){
+            //开启自定义矩形功能，
+            if(this.openCustomRectangleStatus){
                 e.preventDefault()
                 return;
             }

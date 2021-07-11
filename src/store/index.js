@@ -45,7 +45,8 @@ const store = new Vuex.Store({
 
         paste(state, isMouse) {
             if (!state.copyData) {
-                toast('请选择组件')
+                
+                // toast('请选择组件')
                 return
             }
 
