@@ -27,6 +27,7 @@
                         :value="item.value"
                     ></el-option>
                 </el-select>
+                <el-input type="number" v-else-if="['top','left'].includes(key)" step="0.1" :min="0" :max="stage.width" v-model="curComponent.style[key]" />
                 <el-input type="number" v-else :min="0" :max="stage.width" v-model="curComponent.style[key]" />
             </el-form-item>
         </el-form>

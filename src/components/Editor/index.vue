@@ -3,7 +3,7 @@
     <div class="contentEditor">
         <div class="editor" id="editor"
             @mousedown="handleMouseDownOnEditor"
-            :class="{ edit: isEdit,crosshair:ctrlclick }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
+            :class="{ edit: isEdit,crosshair:openCustomRectangleStatus }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
             @contextmenu="handleContextMenu"
         >
             <!--页面组件列表展示-->
@@ -62,12 +62,13 @@ export default {
     },
     data(){
         return {
-            ctrlclick:false,
+             
             selectSomeStyle:{left:"-0px",top:"-0px",width:"0px",height:"0px",borderWidth:"0px"}
         }
     },
     components: { Shape, ContextMenu, MarkLine },
     computed: mapState([
+        'openCustomRectangleStatus',
         'componentData',
         'curComponent',
         'curComponentList',
@@ -75,13 +76,13 @@ export default {
     ]),
     mounted() {
       //
-      eventBus.$on('clickCtrlKey', () => {
-         this.ctrlclick = true;
+      // eventBus.$on('openCustomRectangle', () => {
+      //    this.isOpenCustomRectangle = true;
 
-      })
-      eventBus.$on('releaseCtrlKey', () => {
-         this.ctrlclick = false;
-      })
+      // })
+      // eventBus.$on('closeCustomRectangle', () => {
+      //    this.isOpenCustomRectangle = false;
+      // })
     },
     methods: {
         selectSomeHandle(e){
@@ -148,7 +149,7 @@ export default {
             e.stopPropagation();
             e.preventDefault()
 
-            if(!e.ctrlKey){
+            if(!e.altKey){
                 this.selectSomeHandle(e);
                 return;
             }

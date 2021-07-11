@@ -1,5 +1,5 @@
 import { calculateRotatedPointCoordinate, getCenterPoint } from './translate'
-
+import {changeValue} from '@/utils/utils'
 const funcs = {
     lt: calculateLeftTop,
     t: calculateTop,
@@ -22,8 +22,8 @@ function calculateLeftTop(style, curPositon, pointInfo) {
     if (newWidth > 0 && newHeight > 0) {
         style.width = Math.round(newWidth)
         style.height = Math.round(newHeight)
-        style.left = Math.round(newTopLeftPoint.x)
-        style.top = Math.round(newTopLeftPoint.y)
+        style.left = changeValue(newTopLeftPoint.x)
+        style.top = changeValue(newTopLeftPoint.y)
 
     }
 }
@@ -46,8 +46,8 @@ function calculateTop(style, curPositon, pointInfo) {
         }
 
         style.height = Math.round(newHeight)
-        style.top = Math.round(newCenter.y - (newHeight / 2))
-        style.left = Math.round(newCenter.x - (style.width / 2))
+        style.top = changeValue(newCenter.y - (newHeight / 2))
+        style.left = changeValue(newCenter.x - (style.width / 2))
     }
 }
 
@@ -67,8 +67,8 @@ function calculateRight(style, curPositon, pointInfo) {
         }
 
         style.width = Math.round(newWidth)
-        style.top = Math.round(newCenter.y - (style.height / 2))
-        style.left = Math.round(newCenter.x - (newWidth / 2))
+        style.top = changeValue(newCenter.y - (style.height / 2))
+        style.left = changeValue(newCenter.x - (newWidth / 2))
     }
 }
 
@@ -87,8 +87,8 @@ function calculateBottom(style, curPositon, pointInfo) {
             y: rotatedBottomMiddlePoint.y + (symmetricPoint.y - rotatedBottomMiddlePoint.y) / 2,
         }
         style.height = Math.round(newHeight)
-        style.top = Math.round(newCenter.y - (newHeight / 2))
-        style.left = Math.round(newCenter.x - (style.width / 2))
+        style.top = changeValue(newCenter.y - (newHeight / 2))
+        style.left = changeValue(newCenter.x - (style.width / 2))
     }
 }
 
@@ -108,8 +108,8 @@ function calculateLeft(style, curPositon, pointInfo) {
         }
 
         style.width = Math.round(newWidth)
-        style.top = Math.round(newCenter.y - (style.height / 2))
-        style.left = Math.round(newCenter.x - (newWidth / 2))
+        style.top = changeValue(newCenter.y - (style.height / 2))
+        style.left = changeValue(newCenter.x - (newWidth / 2))
     }
 }
 
@@ -124,8 +124,8 @@ function calculateRightTop(style, curPositon, pointInfo) {
     if (newWidth > 0 && newHeight > 0) {
         style.width = Math.round(newWidth)
         style.height = Math.round(newHeight)
-        style.left = Math.round(newBottomLeftPoint.x)
-        style.top = Math.round(newTopRightPoint.y)
+        style.left = changeValue(newBottomLeftPoint.x)
+        style.top = changeValue(newTopRightPoint.y)
     }
 }
 
@@ -140,8 +140,8 @@ function calculateRightBottom(style, curPositon, pointInfo) {
     if (newWidth > 0 && newHeight > 0) {
         style.width = Math.round(newWidth)
         style.height = Math.round(newHeight)
-        style.left = Math.round(newTopLeftPoint.x)
-        style.top = Math.round(newTopLeftPoint.y)
+        style.left = changeValue(newTopLeftPoint.x)
+        style.top = changeValue(newTopLeftPoint.y)
     }
 }
 
@@ -156,8 +156,8 @@ function calculateLeftBottom(style, curPositon, pointInfo) {
     if (newWidth > 0 && newHeight > 0) {
         style.width = Math.round(newWidth)
         style.height = Math.round(newHeight)
-        style.left = Math.round(newBottomLeftPoint.x)
-        style.top = Math.round(newTopRightPoint.y)
+        style.left = changeValue(newBottomLeftPoint.x)
+        style.top = changeValue(newTopRightPoint.y)
     }
 }
 

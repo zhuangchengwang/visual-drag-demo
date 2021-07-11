@@ -89,7 +89,8 @@ export default {
         'curComponent',
         'curComponentList',
         'componentData',
-        'canvasStyleData'
+        'canvasStyleData',
+        'openCustomRectangleStatus'
     ]),
     mounted() {
         eventBus.$on('runAnimation', () => {
@@ -208,6 +209,7 @@ export default {
                 if(dis==100000){
                     dis = curstyle.left;
                 }
+                dis = utils.changeValue(dis);
                 this.xyLineStyle.width = `${dis}px`
                 return {left: `-${dis}px`,width: `${dis}px`}
             }else{
@@ -226,6 +228,7 @@ export default {
                 if(dis==100000){
                     dis = curstyle.top;
                 }
+                dis = utils.changeValue(dis);
                 this.xyLineStyle.height = `${dis}px`
                 return {top: `-${dis}px`,height: `${dis}px`,lineHeight: `${dis}px`,textIndent:"5px"}
             }
@@ -258,6 +261,7 @@ export default {
                 if(dis==100000){
                     dis = this.canvasStyleData.left+this.canvasStyleData.width - (curstyle.left+curstyle.width);
                 }
+                dis = utils.changeValue(dis);
                 this.xyLineStyle2.width = `${dis}px`
                 return {right: `-${dis}px`,width: `${dis}px`}
             }else{
@@ -276,6 +280,7 @@ export default {
                 if(dis==100000){
                     dis = this.canvasStyleData.top+this.canvasStyleData.height - (curstyle.top +curstyle.height);
                 }
+                dis = utils.changeValue(dis);
                 this.xyLineStyle2.height = `${dis}px`
                 return {bottom: `-${dis}px`,height: `${dis}px`,lineHeight: `${dis}px`,textIndent:"5px"}
             }
@@ -344,7 +349,8 @@ export default {
         },
         //移动元素
         handleMouseDownOnShape(e) {
-            if(e.ctrlKey){
+            //开启自定义矩形功能，
+            if(this.openCustomRectangleStatus){
                 e.preventDefault()
                 return;
             }
@@ -692,7 +698,7 @@ export default {
             left: -6px;
             border: 1px solid #ff0000;
             width: 12px;
-    
+
     }
 }
 .el-icon-refresh-right {

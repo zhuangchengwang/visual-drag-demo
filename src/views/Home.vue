@@ -71,12 +71,14 @@ export default {
             this.isShadow = v;
         },
         listenCopyAndPaste() {
-            const shiftKey = 16,ctrlKey = 17, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
+            const shiftKey = 16,ctrlKey = 17,altKey=18, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
 
 
             window.onkeydown = (e) => {
-                if(e.keyCode == ctrlKey){
-                    eventBus.$emit('clickCtrlKey');
+				console.log("home.vue ",e.keyCode)
+                if(e.keyCode == altKey){
+                    this.$store.commit("setOpenCustomRectangleStatus",1)
+                    // eventBus.$emit('openCustomRectangle');
                 }
                 if (e.ctrlKey && e.keyCode == cKey) {
                     this.$store.commit('copy')
@@ -145,8 +147,9 @@ export default {
 
             window.onkeyup = (e) => {
 
-                if(e.keyCode == ctrlKey){
-                    eventBus.$emit('releaseCtrlKey');
+                if(e.keyCode == altKey){
+                    // eventBus.$emit('closeCustomRectangle');
+                    this.$store.commit("setOpenCustomRectangleStatus",0)
                 }
                 if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
                     setTimeout(()=>{

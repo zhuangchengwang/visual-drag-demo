@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {changeValue} from '@/utils/utils'
 function getProtype(object,key,defaultV){
     let a = _.get(object, key);
     return a!=undefined?a:defaultV;
@@ -56,10 +57,10 @@ export function isAContainB(aNode_borderPosition_1, bNode_borderPosition_1,nearl
                nearlyPos.top = a_y1;
             }
             if(b_x2>a_x2){
-               nearlyPos.left = Math.round(a_x2-bNode_borderPosition_1.width);
+               nearlyPos.left = changeValue(a_x2-bNode_borderPosition_1.width);
             }
             if(b_y2>a_y2){
-               nearlyPos.top = Math.round(a_y2-bNode_borderPosition_1.height);
+               nearlyPos.top = changeValue(a_y2-bNode_borderPosition_1.height);
             }
             //上方结果使用相减 可能会出现负数
             if(nearlyPos.left<a_x1){

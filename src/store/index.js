@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { deepCopy, swap } from '@/utils/utils'
+import { deepCopy, swap,changeValue } from '@/utils/utils'
 import toast from '@/utils/toast'
 import generateID from '@/utils/generateID'
 Vue.use(Vuex)
@@ -8,6 +8,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state: {
         editMode: 'edit', // 编辑器模式 edit read
+        openCustomRectangleStatus:0,//是否开启自定义矩形
         canvasStyleData: { // 页面全局数据
             left:0,
             top:0,
@@ -90,6 +91,9 @@ const store = new Vuex.Store({
         setEditMode(state, mode) {
             state.editMode = mode
         },
+        setOpenCustomRectangleStatus(state, mode) {
+            state.openCustomRectangleStatus = mode
+        },
 
         setCanvasStyle(state, style) {
             state.canvasStyleData = style;
@@ -128,22 +132,24 @@ const store = new Vuex.Store({
         },
 
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {
-            if (!isNaN(top)) curComponent.style.top = Number(Math.round(top))
-            if (!isNaN(left)) curComponent.style.left = Number(Math.round(left))
-            if (width) curComponent.style.width = Number(Math.round(width))
-            if (height) curComponent.style.height = Number(Math.round(height))
-            if (rotate) curComponent.style.rotate = Number(Math.round(rotate))
+            if (!isNaN(top)) curComponent.style.top = changeValue(Number(top))
+            if (!isNaN(left)) curComponent.style.left = changeValue(Number(left))
+            if (width) curComponent.style.width = Math.round(Number(width))
+            if (height) curComponent.style.height = Math.round(Number(height))
+            if (rotate) curComponent.style.rotate = Math.round(Number(rotate))
         },
 
         setShapePosStyle({ curComponent }, { key, value }) {
-            value = Math.round(value);
+            value = Number(value);
             if(key=='top'){
                 value = value>store.state.canvasStyleData.height?store.state.canvasStyleData.height:value;
-            }
+				value = changeValue(value)
+			}
             if(key=='left'){
                 value = value>store.state.canvasStyleData.width?store.state.canvasStyleData.width:value;
-            }
-            curComponent.style[key] = Number(value)
+				value = changeValue(value)
+			}
+            curComponent.style[key] = value
         },
 
         undo(state) {

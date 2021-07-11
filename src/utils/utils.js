@@ -49,7 +49,7 @@ export function  changeJsonValue(obj) {
 
 export function getPositionByEditor(x,y){
     const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
-    return {left:Math.round(x-editorRectInfo.left),top:Math.round(y-editorRectInfo.top)}
+    return {left:changeValue(x-editorRectInfo.left),top:changeValue(y-editorRectInfo.top)}
 }
 export function copyObject(obj){
     return JSON.parse(JSON.stringify(obj))
@@ -116,8 +116,8 @@ export function formatParams(data){
 
 }
 
-export function toFixed(value,dis=1){
-         
-        return value.toFixed(dis);
+export function changeValue(value,dis=1){
+        // return Math.round(value)
+        return Number(value.toFixed(dis));
 
 }
