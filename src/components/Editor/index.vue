@@ -5,6 +5,7 @@
             @mousedown="handleMouseDownOnEditor"
             :class="{ edit: isEdit,crosshair:openCustomRectangleStatus }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
             @contextmenu="handleContextMenu"
+            @mouseover="onmouseover"
 
         >
             <!--页面组件列表展示-->
@@ -49,7 +50,7 @@ import Shape from './Shape'
 import getStyle from '@/utils/style'
 import ContextMenu from './ContextMenu'
 import MarkLine from './MarkLine'
-import { deepCopy,getPositionByEditor } from '@/utils/utils'
+import { deepCopy,getPositionByEditor,getComponentConfigByName } from '@/utils/utils'
 import componentList from '@/custom-component/component-list' // 左侧列表数据
 import generateID from '@/utils/generateID'
 import * as NodeElment from '@/utils/NodeElment'
@@ -76,6 +77,7 @@ export default {
         'canvasStyleData',
     ]),
     mounted() {
+        
       //
       // eventBus.$on('openCustomRectangle', () => {
       //    this.isOpenCustomRectangle = true;
@@ -86,7 +88,10 @@ export default {
       // })
     },
     methods: {
-
+        onmouseover(e){
+            console.log("index.vue onmouseover mark-line focus",e);
+            document.querySelector('#mark-line').focus()
+        },
         selectSomeHandle(e){
 
             const startY = e.clientY
@@ -145,7 +150,7 @@ export default {
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)
         },
-        //使用ctrl 画矩形 功能
+        //自定义画矩形 功能
         handleMouseDownOnEditor(e){
             console.log("index.vue handleMouseDownOnEditor e.stopPropagation e.preventDefault")
             e.stopPropagation();
@@ -155,11 +160,11 @@ export default {
                 this.selectSomeHandle(e);
                 return;
             }
-            
+
             // this.$store.commit('setCurComponent', { component: null, index: null })
             const startY = e.clientY
             const startX = e.clientX
-            const component = deepCopy(componentList[3])//div
+            const component = deepCopy(getComponentConfigByName("VDiv"))//div
             // const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
             let lefttop = getPositionByEditor(e.clientX,e.clientY)
             component.style.left = lefttop.left
@@ -182,6 +187,7 @@ export default {
                 //只要长宽不等于0 就是已经画了一个矩形
                 if(!addCount && component.style.width && component.style.height){
                     this.$store.commit('addComponent', { component })
+                    this.$store.commit('setCurComponent', { component: component})
                     addCount++;
                 }
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
@@ -194,7 +200,7 @@ export default {
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
                  this.$store.commit('sort')
-                 
+
             }
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)
@@ -270,7 +276,7 @@ export default {
 .crosshair{
     cursor: crosshair;
 }
-.crosshair .shape:hover{
+.crosshair *:hover{
     cursor: crosshair !important;
 }
 .editor {

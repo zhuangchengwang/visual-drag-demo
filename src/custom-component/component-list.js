@@ -14,6 +14,7 @@ const commonStyle = {
     color: '',
     backgroundColor: 'rgba(0, 0, 0, 0)',
     rotate: '',
+    pointerEvents: 'none',
     // opacity: 1,
 }
 
@@ -32,7 +33,7 @@ const list = [
 
         },
     },
-    
+
     {
         component: 'v-button',
         label: '按钮',
@@ -102,6 +103,8 @@ list.forEach(item => {
     item.drag = {startLeft:null,startTop:null}
     //生成代码的时候会计算一遍
     item.boundingClientRect={}
+    //是否可以被选中
+    item.isCanBeSelect = true
 })
 
 export default list

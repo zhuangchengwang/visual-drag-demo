@@ -4,9 +4,7 @@ import { deepCopy, swap,changeValue } from '@/utils/utils'
 import toast from '@/utils/toast'
 import generateID from '@/utils/generateID'
 Vue.use(Vuex)
-
-const store = new Vuex.Store({
-    state: {
+const stateJson = {
         editMode: 'edit', // 编辑器模式 edit read
         openCustomRectangleStatus:0,//是否开启自定义矩形
         canvasStyleData: { // 页面全局数据
@@ -19,14 +17,25 @@ const store = new Vuex.Store({
         curComponent: null,
         curComponentIndex: null,
         curComponentList:[],
+        curAndListComponentDis:null,//当前元素于与其他被选元素的top和left的相对距离
         snapshotData: [], // 编辑器快照数据
         snapshotIndex: -1, // 快照索引
         menuTop: 0, // 右击菜单数据
         menuLeft: 0,
         menuShow: false,
-        copyData: null, // 复制粘贴剪切
-    },
+        copyData: {data:[],index:null}, // 复制粘贴剪切
+        isSelectMore:false,//是否多选
+    };
+
+const store = new Vuex.Store({
+    state: deepCopy(stateJson),
     mutations: {
+        resetState(state){
+            let state2 = deepCopy(stateJson);
+            for(let i in state2){
+                state[i] = state2[i]
+            }
+        },
         getBoundingClientRect(state){
             for(let i in state.componentData){
                 let cod = state.componentData[i];
@@ -37,56 +46,81 @@ const store = new Vuex.Store({
             }
         },
         copy(state) {
-            state.copyData = {
-                data: deepCopy(state.curComponent),
-                index: state.curComponentIndex,
+            if (state.curComponentList.length==0) {
+                return
             }
+            let index;
+            for( index in state.componentData){
+                if(state.componentData[index].id==state.curComponentList[state.curComponentList.length-1].id){
+
+                    break;
+                }
+            }
+            state.copyData = {
+                data: deepCopy(state.curComponentList),
+                index: index,
+            }
+
         },
 
         paste(state, isMouse) {
-            if (!state.copyData) {
-                
-                // toast('请选择组件')
+            if (state.copyData.data.length==0) {
+                toast('请先复制组件')
                 return
             }
-
+            store.commit("clearCurComponentList");
             let data = deepCopy(state.copyData.data)
-
-            if (isMouse) {
-                data.style.top = state.menuTop
-                data.style.left = state.menuLeft
-            } else {
-                data.style.top += 10
-                data.style.left += 10
+            let curcom = {};
+            let i = 0;
+            for(i in data){
+                curcom = deepCopy(data[i]);
+                if (isMouse) {
+                    curcom.style.top = state.menuTop
+                    curcom.style.left = state.menuLeft
+                } else {
+                    curcom.style.top += 10
+                    curcom.style.left += 10
+                }
+                curcom.id = generateID()
+                store.commit('addComponent', { component: curcom })
+                store.commit('setCurComponentList', { component: curcom})
+            }
+            let index = 0;
+            for(index in state.componentData){
+                if(state.componentData[index].id==curcom.id){
+                    store.commit('setCurComponent', { component: curcom, index: index })
+                    break;
+                }
             }
 
-            data.id = generateID()
-            store.commit('addComponent', { component: data })
             store.commit('recordSnapshot')
+            console.log(state.copyData,state.componentData,state.curComponentList)
             // state.copyData = null
             state.copyData = {
                 data: deepCopy(data),
-                index: data.id,
+                index: index,
             }
 
         },
 
         cut(state) {
-            if (!state.curComponent) {
-                toast('请选择组件')
-                return
-            }
+            //放弃剪切功能，直接拖拽不就可以了吗
+            toast('请直接拖拽元素到指定位置即可')
+            // if (!state.curComponent) {
+            //     toast('请选择组件')
+            //     return
+            // }
 
-            if (state.copyData) {
-                store.commit('addComponent', { component: state.copyData.data, index: state.copyData.index })
-                if (state.curComponentIndex >= state.copyData.index) {
-                    // 如果当前组件索引大于等于插入索引，需要加一，因为当前组件往后移了一位
-                    state.curComponentIndex++
-                }
-            }
+            // if (state.copyData) {
+            //     store.commit('addComponent', { component: state.copyData.data, index: state.copyData.index })
+            //     if (state.curComponentIndex >= state.copyData.index) {
+            //         // 如果当前组件索引大于等于插入索引，需要加一，因为当前组件往后移了一位
+            //         state.curComponentIndex++
+            //     }
+            // }
 
-            store.commit('copy')
-            store.commit('deleteComponent')
+            // store.commit('copy')
+            // store.commit('deleteComponent')
         },
 
         setEditMode(state, mode) {
@@ -112,24 +146,57 @@ const store = new Vuex.Store({
         },
 
         setCurComponent(state, { component, index }) {
+            if(component && !component.isCanBeSelect){
+                return;
+            }
             state.curComponent = component
             state.curComponentIndex = index
-        },
+            if(component === null){
+                state.curAndListComponentDis = {}
+                return;
+            }
+            let i,curcom;
+            let dis = {};
+            for(i in state.curComponentList){
+                curcom = state.curComponentList[i]
+                dis[i] = {top:curcom.style.top - state.curComponent.style.top,left:curcom.style.left - state.curComponent.style.left}
+            }
+            state.curAndListComponentDis = dis;
 
+        },
+        setCurComponentListPostion(state){
+            let i,curcom;
+            let curComponent = state.curComponent;
+            for(i in state.curComponentList){
+                curcom = state.curComponentList[i]
+                curcom.style.top = curComponent.style.top + state.curAndListComponentDis[i].top
+                curcom.style.left = curComponent.style.left + state.curAndListComponentDis[i].left
+            }
+        },
         setCurComponentList(state, { component, isclear }) {
             if(isclear){
                 Vue.set(state, 'curComponentList', [])
+                state.curAndListComponentDis = {}
+                state.isSelectMore = false
+            }
+            if(component && !component.isCanBeSelect){
+                return;
             }
             for(let c in state.curComponentList){
                 if(component.id === state.curComponentList[c].id){
                     return;
                 }
             }
+
             state.curComponentList.push(component)
+            if(state.curComponentList.length>1){
+                state.isSelectMore = true
+            }
         },
         clearCurComponentList(state) {
             // state.curComponentList.splice(0,state.curComponentList.length);
              Vue.set(state, 'curComponentList', [])
+             state.curAndListComponentDis = {}
         },
 
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {
@@ -201,7 +268,16 @@ const store = new Vuex.Store({
         },
 
         deleteComponent(state, index = state.curComponentIndex) {
-            state.componentData.splice(index, 1)
+            let i = 0;let j = 0;
+            for(i in state.curComponentList){
+                for(j in state.componentData){
+                    if(state.curComponentList[i].id==state.componentData[j].id){
+                        state.componentData.splice(j, 1)
+                    }
+                }
+
+            }
+
         },
 
         upComponent({ componentData, curComponentIndex }) {

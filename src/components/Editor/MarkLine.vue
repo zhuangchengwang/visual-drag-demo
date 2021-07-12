@@ -1,5 +1,5 @@
 <template>
-    <div id="mark-line" class="mark-line" @mousedown="deselectCurComponent" tabindex="0">
+    <div id="mark-line" class="mark-line" @mousedown="deselectCurComponent"  tabindex="0">
 
         <div
             v-for="line in lines"
@@ -14,10 +14,11 @@
 
 <script>
 import eventBus from '@/utils/eventBus'
-import {copyObject} from '@/utils/utils'
+import {copyObject,deepCopy,getComponentConfigByName} from '@/utils/utils'
 import { mapState } from 'vuex'
 import { sin, cos } from '@/utils/translate'
 import * as NodeElment from '@/utils/NodeElment'
+import generateID from '@/utils/generateID'
 const defaultDiff = 4;
 export default {
     data() {
@@ -147,7 +148,7 @@ export default {
              }
           });
           EventContiner.addEventListener('keyup', (e) => {
-             console.log("keyup",e)
+             // console.log("keyup",e)
              if(e.keyCode == altKey){
                  // eventBus.$emit('closeCustomRectangle');
                  this.$store.commit("setOpenCustomRectangleStatus",0)
@@ -161,9 +162,10 @@ export default {
       })
     },
     methods: {
+
         deselectCurComponent(e) {
                 console.log("markline.vue deselectCurComponent",e);
-                document.querySelector('#mark-line').focus()
+                // document.querySelector('#mark-line').focus()
                 //加上这个if是因为(先前为了使用layuitab可以被点击切换,允许事件冒泡,结果导致,组件选中后马上被取消,因为冒泡会到这里来)
                 //然而,也因此导致了一个问题:右键菜单置顶置地功能无法及时响应,因为要想及时响应就必须取消选中
                 this.$store.commit('setCurComponent', { component: null, index: null })
@@ -171,19 +173,6 @@ export default {
                 this.$store.commit('hideContexeMenu')
         },
 
-        listenCopyAndPaste() {
-            const shiftKey = 16,ctrlKey = 17,altKey=18, vKey = 86, cKey = 67, xKey = 88,leftKey = 37,topKey = 38,rightKey = 39,downKey = 40
-            window.onkeydown = (e) => {
-        		console.log("home.vue ",e,e.keyCode)
-
-
-            }
-
-            window.onkeyup = (e) => {
-
-
-            }
-        },
         hideLine() {
             Object.keys(this.lineStatus).forEach(line => {
                 this.lineStatus[line] = false
@@ -217,7 +206,15 @@ export default {
          */
         showLine(isDownward, isRightward,dragdiff=null) {
             const lines = this.$refs
-            let components = this.componentData
+            let components = deepCopy(this.componentData)
+            //临时生成一个和画布全等的div,作用1：方便元素居中对齐
+            let component = deepCopy(getComponentConfigByName("VDiv"))//div
+            component.style=this.$store.state.canvasStyleData
+            component.style.rotate=''
+            component.id = generateID()
+            components.push(component)
+
+
             let curComponentStyle = this.translateComponentStyle(this.curComponent.style)
              // console.log('this.curComponent.style',copyObject(this.curComponent.style),copyObject(curComponentStyle));
             const curComponentHalfwidth = curComponentStyle.width / 2
@@ -226,6 +223,7 @@ export default {
             this.hideLine()
             //吸附功能
             if(dragdiff===null){
+
                 components.forEach(component => {
                     if (component.id == this.curComponent.id) return;
                 // console.log('components',components,component.style);
@@ -329,9 +327,6 @@ export default {
                             if (!condition.isNearly||!condition.lineNode){
                                 return;
                             }
-
-
-                            if(dragdiff===null){
                                 //resize时不可以使用吸附功能
                                 // 修改当前组件位移(吸附功能)
                                 console.log('setShapePosStyle',condition,rotate != 0,{
@@ -342,7 +337,8 @@ export default {
                                     key,
                                     value: rotate != 0? this.translatecurComponentShift(key, condition, curComponentStyle) : condition.dragShift,
                                 })
-                            }
+                                //设置其他选中元素的坐标
+                                this.$store.commit('setCurComponentListPostion');
                         })
                     })
 
@@ -355,13 +351,15 @@ export default {
             curComponentStyle = this.translateComponentStyle(this.curComponent.style)
 
             components.forEach(component => {
+                console.log("needToShow componentStyle1",component.style)
                 if (component.id == this.curComponent.id) return;
             // console.log('components',components,component.style);
+
                 const componentStyle = this.translateComponentStyle(component.style)
                 const { top, left, bottom, right } = componentStyle
                 const componentHalfwidth = componentStyle.width / 2
                 const componentHalfHeight = componentStyle.height / 2
-
+                console.log("needToShow componentStyle",componentStyle)
                 const conditions = {
                     top: [
                         {
@@ -465,7 +463,7 @@ export default {
                         needToShow.push(condition.line)
                     })
                 })
-                // console.log('needToShow',needToShow,conditions);
+                console.log('needToShow',components,needToShow,conditions);
                 if (needToShow.length) {
                     // 同一方向上同时显示三条线可能不太美观，因此才有了这个解决方案
                     // 同一方向上的线只显示一条，例如多条横条只显示一条横线

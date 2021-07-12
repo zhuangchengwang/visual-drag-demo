@@ -350,8 +350,12 @@ export default {
         },
         //移动元素
         handleMouseDownOnShape(e) {
+            //该元素 不能被选中
+            if(!this.element.isCanBeSelect){
+                return;
+            }
             this.isMouseDownOnShape = true;
-            document.querySelector('#mark-line').focus()
+
             //开启自定义矩形功能，
             if(this.openCustomRectangleStatus){
                 e.preventDefault()
@@ -363,25 +367,30 @@ export default {
             // console.log("handleMouseDownOnShape",e);
             e.stopPropagation()
             let isclear = false;
-            if(e.shiftKey){
+
+            if(e.ctrlKey){
                 if(this.curComponent){
-                    //追加最近一个选中元素（这样的话，当前有一个选中元素，然后你再按住shift键，可以把当前的选中，给添加进来，体验更好）
+                    //追加最近一个选中元素（这样的话，当前有一个选中元素，然后你再按住ctrl键，可以把当前的选中，给添加进来，体验更好）
                   this.$store.commit('setCurComponentList', { component: this.curComponent})
                 }
 
             }else{
-                //清空(<2这个判断在于优化操作，当选中了至少2个元素后，可以不用再按住shift，进行整体移动或新增选中其他元素等操作)
-                if(this.curComponentList.length<2)
+                //如果是多选，并且点击其他非选择元素，则重置为单选
+                if(this.$store.state.isSelectMore && !utils.isInCurComponentList(this.element)){
+                    this.$store.commit('setCurComponentList', { component: this.element,isclear:true})
+                }
+                //清空(如果是多选，可以不用再按住ctrl，进行整体移动操作)
+                if(!this.$store.state.isSelectMore)
                     isclear = true;
             }
+            this.$store.commit('setCurComponentList', { component: this.element,isclear:isclear})
             //设置当前选中元素
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
-            this.$store.commit('setCurComponentList', { component: this.element,isclear:isclear})
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
             const curstyle = { ...this.defaultStyle }
             utils.changeJsonValue(curstyle)
             // 如果直接修改属性，值的类型会变为字符串，所以要转为数值型
-            let minRec;
+            let minRec = {};
             if(this.curComponentList.length>0){
                 for(let i in this.curComponentList){
                     this.curComponentList[i].drag.startTop =  Number(this.curComponentList[i].style.top)
@@ -607,7 +616,7 @@ export default {
 .shape {
     position: absolute;
 
-    &:hover {
+    &.active {
         cursor: move;
     }
 }

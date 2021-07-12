@@ -35,39 +35,47 @@ export default {
     methods: {
         cut() {
             this.$store.commit('cut')
+            this.$store.commit('hideContexeMenu')
         },
 
         copy() {
             this.$store.commit('copy')
+            this.$store.commit('hideContexeMenu')
         },
 
         paste() {
             this.$store.commit('paste', true)
+            this.$store.commit('hideContexeMenu')
         },
 
         deleteComponent() {
             this.$store.commit('deleteComponent')
             this.$store.commit('recordSnapshot')
+            this.$store.commit('hideContexeMenu')
         },
 
         upComponent() {
             this.$store.commit('upComponent')
             this.$store.commit('recordSnapshot')
+            this.$store.commit('hideContexeMenu')
         },
 
         downComponent() {
             this.$store.commit('downComponent')
             this.$store.commit('recordSnapshot')
+            this.$store.commit('hideContexeMenu')
         },
 
         topComponent() {
             this.$store.commit('topComponent')
             this.$store.commit('recordSnapshot')
+            this.$store.commit('hideContexeMenu')
         },
 
         bottomComponent() {
             this.$store.commit('bottomComponent')
             this.$store.commit('recordSnapshot')
+            this.$store.commit('hideContexeMenu')
         },
     },
 }

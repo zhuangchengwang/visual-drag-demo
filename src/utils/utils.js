@@ -1,18 +1,39 @@
-export function deepCopy(target) {
-    if (typeof target == 'object') {
-        const result = Array.isArray(target)? [] : {}
-        for (const key in target) {
-            if (typeof target[key] == 'object') {
-                result[key] = deepCopy(target[key])
-            } else {
-                result[key] = target[key]
-            }
+import componentList from '@/custom-component/component-list' // 左侧列表数据
+import store from '@/store'
+export function isInCurComponentList(component){
+    let isin =false;
+    for(let c in store.state.curComponentList){
+        if(component.id === store.state.curComponentList[c].id){
+            isin = true;
+            break;
         }
-
-        return result
     }
+    return isin;
+}
+export function getComponentConfigByName(name){
+    for(let i in componentList){
+        if(componentList[i].component == name){
+            return componentList[i];
+        }
+    }
+    return {}
+}
+export function deepCopy(target) {
+    return JSON.parse(JSON.stringify(target))
+    // if (typeof target == 'object') {
+    //     const result = Array.isArray(target)? [] : {}
+    //     for (const key in target) {
+    //         if (typeof target[key] == 'object') {
+    //             result[key] = deepCopy(target[key])
+    //         } else {
+    //             result[key] = target[key]
+    //         }
+    //     }
 
-    return target
+    //     return result
+    // }
+
+    // return target
 }
 
 export function swap(arr, i, j) {
@@ -120,4 +141,27 @@ export function changeValue(value,dis=1){
         // return Math.round(value)
         return Number(value.toFixed(dis));
 
+}
+// 遇到相同元素级属性，以后者（main）为准
+// 不返还新Object，而是main改变
+export function mergeJSON (minor, main) {
+  for (var key in minor) {
+
+    if (main[key] === undefined) {  // 不冲突的，直接赋值
+      main[key] = minor[key];
+      continue;
+    }
+
+    // 冲突了，如果是Object，看看有么有不冲突的属性
+    // 不是Object 则以main为主，忽略即可。故不需要else
+    if (isJSON(minor[key])) {
+      // arguments.callee 递归调用，并且与函数名解耦
+      arguments.callee(minor[key], main[key]);
+    }
+  }
+}
+
+// 附上工具
+export function isJSON(target) {
+  return typeof target == "object" && target.constructor == Object;
 }
