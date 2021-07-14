@@ -10,19 +10,20 @@
             :key="index"
             :style="getPointStyle(item)">
         </div>
-        <div v-show="element === curComponent && isMouseDownOnShape " class="shape-x-line" :style="getXyLineStyle('x')">
+        <div v-show="isresize" class="resize" :style="resizeStyle">{{element.style.width}} x {{element.style.height}}</div>
+        <div v-show="element === curComponent  " class="shape-x-line" :style="getXyLineStyle('x')">
             {{xyLineStyle.width}}
              <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent && isMouseDownOnShape " class="shap-y-line" :style="getXyLineStyle('y')">
+        <div v-show="element === curComponent  " class="shap-y-line" :style="getXyLineStyle('y')">
             {{xyLineStyle.height}}
             <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent && isMouseDownOnShape  " class="shape-x2-line" :style="getXyLineStyle2('x')">
+        <div v-show="element === curComponent   " class="shape-x2-line" :style="getXyLineStyle2('x')">
             {{xyLineStyle2.width}}
             <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent && isMouseDownOnShape " class="shap-y2-line" :style="getXyLineStyle2('y')">
+        <div v-show="element === curComponent  " class="shap-y2-line" :style="getXyLineStyle2('y')">
             {{xyLineStyle2.height}}
             <div class="content" ></div>
         </div>
@@ -84,6 +85,8 @@ export default {
             cursors: {},
             xyLineStyle:{width:"",height:""},
             xyLineStyle2:{width:"",height:""},
+            isresize:false,
+            resizeStyle:{top:"0px",left:"0px"}
         }
     },
     computed: mapState([
@@ -91,7 +94,8 @@ export default {
         'curComponentList',
         'componentData',
         'canvasStyleData',
-        'openCustomRectangleStatus'
+        'openCustomRectangleStatus',
+        'openSelectMoreStatus'
     ]),
     mounted() {
         eventBus.$on('runAnimation', () => {
@@ -196,7 +200,7 @@ export default {
                     utils.changeJsonValue(curcom.style)
                     let dd1 = curstyle.left-curcom.style.left;
                     let dd2 = curstyle.left-curcom.style.left-curcom.style.width;
-                    //对于x方向的距离线条 ，如果不在同一行的，就过滤掉，y方向的暂时不考虑
+                    //对于x方向的距离线条 ，如果不在同一行的，就过滤掉，
                     if(curcom.style.top>curstyle.top+curstyle.height || curcom.style.top+curcom.style.height<curstyle.top){
                         continue;
                     }
@@ -219,6 +223,10 @@ export default {
                     utils.changeJsonValue(curcom.style)
                     let dd1 = curstyle.top - curcom.style.top;
                     let dd2 = curstyle.top-curcom.style.top-curcom.style.height;
+                    //对于y方向的距离线条 ，如果不在同一列的，就过滤掉，
+                    if(curcom.style.left>curstyle.left+curstyle.width || curcom.style.left+curcom.style.width<curstyle.left){
+                        continue;
+                    }
                     if(dd1>mindis && dd1 <dis){
                         dis = dd1;
                     }
@@ -271,6 +279,10 @@ export default {
                     utils.changeJsonValue(curcom.style)
                     let dd1 = curcom.style.top-(curstyle.top +curstyle.height);
                     let dd2 = (curcom.style.top+curcom.style.height)-(curstyle.top +curstyle.height);
+                    //对于y方向的距离线条 ，如果不在同一列的，就过滤掉，
+                    if(curcom.style.left>curstyle.left+curstyle.width || curcom.style.left+curcom.style.width<curstyle.left){
+                        continue;
+                    }
                     if(dd1>mindis && dd1 <dis){
                         dis = dd1;
                     }
@@ -354,7 +366,6 @@ export default {
             if(!this.element.isCanBeSelect){
                 return;
             }
-            this.isMouseDownOnShape = true;
 
             //开启自定义矩形功能，
             if(this.openCustomRectangleStatus){
@@ -365,10 +376,11 @@ export default {
                 e.preventDefault()
             }
             // console.log("handleMouseDownOnShape",e);
-            e.stopPropagation()
+            // e.stopPropagation()
             let isclear = false;
-
-            if(e.ctrlKey){
+            this.isMouseDownOnShape = true;
+            //开启多选功能
+            if(this.openSelectMoreStatus){
                 if(this.curComponent){
                     //追加最近一个选中元素（这样的话，当前有一个选中元素，然后你再按住ctrl键，可以把当前的选中，给添加进来，体验更好）
                   this.$store.commit('setCurComponentList', { component: this.curComponent})
@@ -386,6 +398,11 @@ export default {
             this.$store.commit('setCurComponentList', { component: this.element,isclear:isclear})
             //设置当前选中元素
             this.$store.commit('setCurComponent', { component: this.element, index: this.index })
+            if(this.openSelectMoreStatus){
+                return;
+            }
+
+
             this.cursors = this.getCursor() // 根据旋转角度获取光标位置
             const curstyle = { ...this.defaultStyle }
             utils.changeJsonValue(curstyle)
@@ -451,8 +468,11 @@ export default {
                 document.removeEventListener('mousemove', move)
                 document.removeEventListener('mouseup', up)
             }
+
             document.addEventListener('mousemove', move)
             document.addEventListener('mouseup', up)
+
+
         },
 
         selectCurComponent(e) {
@@ -545,6 +565,9 @@ export default {
                     };
                     break;
             }
+            //style里面的top left width heigt 都是没有经过旋转的坐标
+            //center 是中心点，绕中心点旋转，中心的坐标是不会改变的
+            //坐标运算，计算当前点击点的实际坐标
             curPoint = calculateRotatedPointCoordinate(curPoint, center, style.rotate)
             // curPoint = {
             //     x:Math.round(curPoint.x),
@@ -560,6 +583,7 @@ export default {
             let needSave = false
             let isFirst = true
             const move = (moveEvent) => {
+
                 // 第一次点击时也会触发 move，所以会有“刚点击组件但未移动，组件的大小却改变了”的情况发生
                 // 因此第一次点击时不触发 move 事件
                 if (isFirst) {
@@ -571,10 +595,16 @@ export default {
 
                 needSave = true
                 // 当前移动坐标(相对于编辑器的坐标)
-                const curPositon = {
-                    x: curX - editorRectInfo.left,
-                    y: curY - editorRectInfo.top,
+                let curPositon = {
+                    x: Math.round(curX - editorRectInfo.left),
+                    y: Math.round(curY - editorRectInfo.top),
                 }
+                this.isresize = true;
+                let r_top=curPositon.y-this.defaultStyle.top+10
+                let r_left = curPositon.x-this.defaultStyle.left+20
+                this.resizeStyle={top:`${r_top}px`,left:`${r_left}px`}
+                //zcw 将curPositon换成curPoint 试一下 会导致无法改变大小
+                // curPositon = curPoint;
                 calculateComponentPositonAndSize(point, style, curPositon, {
                     center,
                     curPoint,
@@ -599,6 +629,7 @@ export default {
             }
 
             const up = () => {
+                this.isresize = false;
                 document.removeEventListener('mousemove', move)
                 eventBus.$emit('unresize')
                 document.removeEventListener('mouseup', up)
@@ -624,6 +655,16 @@ export default {
     outline: 1px solid #70c0ff;
     user-select: none;
 }
+.resize{
+    position: absolute;
+    background: black;
+    width: 80px;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    border-radius: 10px;
+}
+
 .shape-point {
     position: absolute;
     background: #fff;
@@ -646,7 +687,7 @@ export default {
     .content
     {
             position: absolute;
-            left: -3px;
+            left: -2px;
             top: -6px;
             border: 1px solid #ff0000;
             height: 12px;
@@ -666,7 +707,7 @@ export default {
     .content
     {
             position: absolute;
-            top: -3px;
+            top: -2px;
             left: -6px;
             border: 1px solid #ff0000;
             width: 12px;
@@ -687,7 +728,7 @@ export default {
     .content
     {
             position: absolute;
-            right: -3px;
+            right: -2px;
             top: -6px;
             border: 1px solid #ff0000;
             height: 12px;
@@ -707,7 +748,7 @@ export default {
     .content
     {
             position: absolute;
-            bottom: -3px;
+            bottom: -2px;
             left: -6px;
             border: 1px solid #ff0000;
             width: 12px;

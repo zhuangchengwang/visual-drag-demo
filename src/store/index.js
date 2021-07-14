@@ -6,7 +6,8 @@ import generateID from '@/utils/generateID'
 Vue.use(Vuex)
 const stateJson = {
         editMode: 'edit', // 编辑器模式 edit read
-        openCustomRectangleStatus:0,//是否开启自定义矩形
+        openCustomRectangleStatus:0,//是否开启自定义矩形，即是否按下alt
+        openSelectMoreStatus:0,//是否开启自定义矩形，即是否按下ctrl
         canvasStyleData: { // 页面全局数据
             left:0,
             top:0,
@@ -24,7 +25,7 @@ const stateJson = {
         menuLeft: 0,
         menuShow: false,
         copyData: {data:[],index:null}, // 复制粘贴剪切
-        isSelectMore:false,//是否多选
+        isSelectMore:false,//当前是否选中多个元素
     };
 
 const store = new Vuex.Store({
@@ -129,7 +130,9 @@ const store = new Vuex.Store({
         setOpenCustomRectangleStatus(state, mode) {
             state.openCustomRectangleStatus = mode
         },
-
+        setOpenSelectMoreStatus(state, mode) {
+            state.openSelectMoreStatus = mode
+        },
         setCanvasStyle(state, style) {
             state.canvasStyleData = style;
 
@@ -182,6 +185,9 @@ const store = new Vuex.Store({
             if(component && !component.isCanBeSelect){
                 return;
             }
+            if(!component){
+                return;
+            }
             for(let c in state.curComponentList){
                 if(component.id === state.curComponentList[c].id){
                     return;
@@ -189,6 +195,7 @@ const store = new Vuex.Store({
             }
 
             state.curComponentList.push(component)
+            state.curComponent = component
             if(state.curComponentList.length>1){
                 state.isSelectMore = true
             }
@@ -197,6 +204,7 @@ const store = new Vuex.Store({
             // state.curComponentList.splice(0,state.curComponentList.length);
              Vue.set(state, 'curComponentList', [])
              state.curAndListComponentDis = {}
+             state.curComponent = null
         },
 
         setShapeStyle({ curComponent }, { top, left, width, height, rotate }) {

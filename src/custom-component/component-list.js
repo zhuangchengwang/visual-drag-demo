@@ -14,7 +14,7 @@ const commonStyle = {
     color: '',
     backgroundColor: 'rgba(0, 0, 0, 0)',
     rotate: '',
-    pointerEvents: 'none',
+    
     // opacity: 1,
 }
 

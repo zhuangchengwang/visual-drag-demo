@@ -7,7 +7,7 @@
             <input type="file" @change="handleFileChange" id="input" hidden />
             <el-button @click="preview" class="mgl10">预览</el-button>
             <el-button @click="save">保存</el-button>
-            <!-- <el-button @click="clearCanvas">重置画布</el-button> -->
+            <el-button @click="clearCanvas">重置画布</el-button>
             <el-button type="success" @click="crateCode">生成代码</el-button>
             <el-select class="mgl10" v-model="canvasMode" @change="selectCanvasMode" placeholder="请选画布大小">
                 <el-option

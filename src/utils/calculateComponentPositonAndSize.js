@@ -14,6 +14,7 @@ const funcs = {
 function calculateLeftTop(style, curPositon, pointInfo) {
     const { symmetricPoint } = pointInfo
     const newCenterPoint = getCenterPoint(curPositon, symmetricPoint)
+    //计算根据圆心旋转后的点的坐标，反方向旋转，计算新的坐标
     const newTopLeftPoint = calculateRotatedPointCoordinate(curPositon, newCenterPoint, -style.rotate)
     const newBottomRightPoint = calculateRotatedPointCoordinate(symmetricPoint, newCenterPoint, -style.rotate)
 
@@ -26,6 +27,7 @@ function calculateLeftTop(style, curPositon, pointInfo) {
         style.top = changeValue(newTopLeftPoint.y)
 
     }
+
 }
 
 function calculateTop(style, curPositon, pointInfo) {

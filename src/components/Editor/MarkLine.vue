@@ -83,6 +83,11 @@ export default {
                  this.$store.commit("setOpenCustomRectangleStatus",1)
                  // eventBus.$emit('openCustomRectangle');
              }
+             if(e.keyCode == ctrlKey){
+                 this.$store.commit("setOpenSelectMoreStatus",1)
+                 // eventBus.$emit('openCustomRectangle');
+             }
+             
              if (e.ctrlKey && e.keyCode == cKey) {
                  this.$store.commit('copy')
              } else if (e.ctrlKey  && e.keyCode == vKey) {
@@ -152,6 +157,11 @@ export default {
              if(e.keyCode == altKey){
                  // eventBus.$emit('closeCustomRectangle');
                  this.$store.commit("setOpenCustomRectangleStatus",0)
+             }
+             
+             if(e.keyCode == ctrlKey){
+                 this.$store.commit("setOpenSelectMoreStatus",0)
+                 // eventBus.$emit('openCustomRectangle');
              }
              if([leftKey,rightKey,topKey,downKey].includes(e.keyCode)){
                  setTimeout(()=>{
@@ -455,7 +465,7 @@ export default {
                 Object.keys(conditions).forEach(key => {
                     // 遍历符合的条件并处理
                     conditions[key].forEach((condition) => {
-                        if (!condition.isNearly||!condition.lineNode){
+                        if (!condition.iseq||!condition.lineNode){
                             return;
                         }
                         //全等才显示对齐参考线,相近表现为吸附

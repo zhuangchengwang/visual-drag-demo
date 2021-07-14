@@ -3,7 +3,7 @@
     <div class="contentEditor">
         <div class="editor" id="editor"
             @mousedown="handleMouseDownOnEditor"
-            :class="{ edit: isEdit,crosshair:openCustomRectangleStatus }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
+            :class="{ edit: isEdit,crosshair:openCustomRectangleStatus,pointer:openSelectMoreStatus }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
             @contextmenu="handleContextMenu"
             @mouseover="onmouseover"
 
@@ -75,9 +75,10 @@ export default {
         'curComponent',
         'curComponentList',
         'canvasStyleData',
+        'openSelectMoreStatus'
     ]),
     mounted() {
-        
+
       //
       // eventBus.$on('openCustomRectangle', () => {
       //    this.isOpenCustomRectangle = true;
@@ -131,11 +132,18 @@ export default {
             }
 
             const up = () => {
+                if(xdiff>10 || ydiff >10){
+                    this.$store.commit('clearCurComponentList')
+                }
+
                 for(let i in this.componentData){
                     let comp = this.componentData[i].style;
                     console.log("ydiff,xdiff",ydiff,xdiff)
                     if(comp.top+comp.height<=top2 || comp.left+comp.width<=left2 ||comp.top >= top2+ydiff || comp.left >= left2+xdiff){
 
+                        continue;
+                    }
+                    if(NodeElment.isAContainB(comp,{top:top2,left:left2,width:xdiff,height:ydiff})){
                         continue;
                     }
 
@@ -155,9 +163,11 @@ export default {
             console.log("index.vue handleMouseDownOnEditor e.stopPropagation e.preventDefault")
             e.stopPropagation();
             e.preventDefault()
-
-            if(!e.altKey){
+            if(this.openSelectMoreStatus){
                 this.selectSomeHandle(e);
+                return;
+            }
+            if(!this.openCustomRectangleStatus){
                 return;
             }
 
@@ -187,7 +197,7 @@ export default {
                 //只要长宽不等于0 就是已经画了一个矩形
                 if(!addCount && component.style.width && component.style.height){
                     this.$store.commit('addComponent', { component })
-                    this.$store.commit('setCurComponent', { component: component})
+                    // this.$store.commit('setCurComponent', { component: component})
                     addCount++;
                 }
                 // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
@@ -273,7 +283,11 @@ export default {
     padding: 10px;
     min-width: 1000px;
 }
-.crosshair{
+
+.pointer *:hover{
+    cursor: pointer !important;
+}
+.crosshair {
     cursor: crosshair;
 }
 .crosshair *:hover{

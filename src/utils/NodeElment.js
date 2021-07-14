@@ -118,12 +118,12 @@ export function isAContainBResize(aNode_borderPosition_1, bNode_borderPosition_1
             }
             //left
             if(b_x1<a_x1){
-               nearlyPos.left = a_x1;
+               nearlyWh.left = a_x1;
                nearlyWh.width = b_x2-b_x1;
             }
             //up
             if(b_y1<a_y1){
-               nearlyPos.top = a_y1;
+               nearlyWh.top = a_y1;
                nearlyWh.height = b_y2-b_y1;
             }
 
