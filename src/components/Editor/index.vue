@@ -3,7 +3,7 @@
     <div class="contentEditor">
         <div class="editor" id="editor"
             @mousedown="handleMouseDownOnEditor"
-            :class="{ edit: isEdit,crosshair:openCustomRectangleStatus,pointer:openSelectMoreStatus }" :style="{ width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
+            :class="{ edit: isEdit,crosshair:openCustomRectangleStatus,pointer:openSelectMoreStatus }" :style="{ transform:'scale('+scale+')',width: canvasStyleData.width + 'px', height: canvasStyleData.height + 'px' }"
             @contextmenu="handleContextMenu"
             @mouseover="onmouseover"
 
@@ -75,7 +75,8 @@ export default {
         'curComponent',
         'curComponentList',
         'canvasStyleData',
-        'openSelectMoreStatus'
+        'openSelectMoreStatus',
+        'scale'
     ]),
     mounted() {
 
@@ -97,7 +98,7 @@ export default {
 
             const startY = e.clientY
             const startX = e.clientX
-            let {left,top} = getPositionByEditor(e.clientX,e.clientY)
+            let {left,top} = getPositionByEditor(e.clientX,e.clientY,this.scale)
             let left2 = left;
             let top2 = top;
             let xdiff = 0;
@@ -122,8 +123,8 @@ export default {
                     top2 =top+ydiff;
                     this.selectSomeStyle.top = `${top2}px`
                 }
-                xdiff = Math.abs(xdiff)
-                ydiff = Math.abs(ydiff)
+                xdiff = Math.abs(xdiff/this.scale)
+                ydiff = Math.abs(ydiff/this.scale)
 
 
                 this.selectSomeStyle.width = `${xdiff}px`;
@@ -176,7 +177,7 @@ export default {
             const startX = e.clientX
             const component = deepCopy(getComponentConfigByName("VDiv"))//div
             // const editorRectInfo = document.querySelector('#editor').getBoundingClientRect()
-            let lefttop = getPositionByEditor(e.clientX,e.clientY)
+            let lefttop = getPositionByEditor(e.clientX,e.clientY,this.scale)
             component.style.left = lefttop.left
             component.style.top = lefttop.top
             component.style.width = 0
@@ -192,8 +193,8 @@ export default {
                 // curX - startX > 0 true 表示向右移动 false 表示向左移动
                 const xdiff = curX - startX
                 const ydiff = curY - startY
-                component.style.width = Math.abs(xdiff);
-                component.style.height = Math.abs(ydiff);
+                component.style.width = Math.abs(xdiff/this.scale);
+                component.style.height = Math.abs(ydiff/this.scale);
                 //只要长宽不等于0 就是已经画了一个矩形
                 if(!addCount && component.style.width && component.style.height){
                     this.$store.commit('addComponent', { component })
@@ -298,6 +299,8 @@ export default {
     background: #ebeef5;
     flex-shrink: 0;
     box-shadow: #3a8ee6 0px 0px 4px;
+    transform: scale(1);
+    transform-origin: left top;
 }
 .edit {
     .component {

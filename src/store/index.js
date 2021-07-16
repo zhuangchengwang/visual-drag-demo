@@ -26,6 +26,7 @@ const stateJson = {
         menuShow: false,
         copyData: {data:[],index:null}, // 复制粘贴剪切
         isSelectMore:false,//当前是否选中多个元素
+        scale:1
     };
 
 const store = new Vuex.Store({
@@ -126,6 +127,9 @@ const store = new Vuex.Store({
 
         setEditMode(state, mode) {
             state.editMode = mode
+        },
+        setEditScale(state, scale) {
+            state.scale = scale
         },
         setOpenCustomRectangleStatus(state, mode) {
             state.openCustomRectangleStatus = mode

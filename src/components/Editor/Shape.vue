@@ -11,20 +11,20 @@
             :style="getPointStyle(item)">
         </div>
         <div v-show="isresize" class="resize" :style="resizeStyle">{{element.style.width}} x {{element.style.height}}</div>
-        <div v-show="element === curComponent  " class="shape-x-line" :style="getXyLineStyle('x')">
-            {{xyLineStyle.width}}
+        <div v-show="element === curComponent && xyLineStyle.width  " class="shape-x-line" :style="getXyLineStyle('x')">
+            {{xyLineStyle.width}}px
              <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent  " class="shap-y-line" :style="getXyLineStyle('y')">
-            {{xyLineStyle.height}}
+        <div v-show="element === curComponent  && xyLineStyle.height " class="shap-y-line" :style="getXyLineStyle('y')">
+            {{xyLineStyle.height}}px
             <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent   " class="shape-x2-line" :style="getXyLineStyle2('x')">
-            {{xyLineStyle2.width}}
+        <div v-show="element === curComponent  && xyLineStyle2.width  " class="shape-x2-line" :style="getXyLineStyle2('x')">
+            {{xyLineStyle2.width}}px
             <div class="content" ></div>
         </div>
-        <div v-show="element === curComponent  " class="shap-y2-line" :style="getXyLineStyle2('y')">
-            {{xyLineStyle2.height}}
+        <div v-show="element === curComponent  && xyLineStyle2.height" class="shap-y2-line" :style="getXyLineStyle2('y')">
+            {{xyLineStyle2.height}}px
             <div class="content" ></div>
         </div>
         <slot></slot>
@@ -215,7 +215,7 @@ export default {
                     dis = curstyle.left;
                 }
                 dis = utils.changeValue(dis);
-                this.xyLineStyle.width = `${dis}px`
+                this.xyLineStyle.width = dis
                 return {left: `-${dis}px`,width: `${dis}px`}
             }else{
                 for(let i in componentData){
@@ -238,7 +238,7 @@ export default {
                     dis = curstyle.top;
                 }
                 dis = utils.changeValue(dis);
-                this.xyLineStyle.height = `${dis}px`
+                this.xyLineStyle.height = dis
                 return {top: `-${dis}px`,height: `${dis}px`,lineHeight: `${dis}px`,textIndent:"5px"}
             }
         },
@@ -271,7 +271,7 @@ export default {
                     dis = this.canvasStyleData.left+this.canvasStyleData.width - (curstyle.left+curstyle.width);
                 }
                 dis = utils.changeValue(dis);
-                this.xyLineStyle2.width = `${dis}px`
+                this.xyLineStyle2.width = dis
                 return {right: `-${dis}px`,width: `${dis}px`}
             }else{
                 for(let i in componentData){
@@ -294,7 +294,7 @@ export default {
                     dis = this.canvasStyleData.top+this.canvasStyleData.height - (curstyle.top +curstyle.height);
                 }
                 dis = utils.changeValue(dis);
-                this.xyLineStyle2.height = `${dis}px`
+                this.xyLineStyle2.height = dis
                 return {bottom: `-${dis}px`,height: `${dis}px`,lineHeight: `${dis}px`,textIndent:"5px"}
             }
         },

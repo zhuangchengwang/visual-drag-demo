@@ -38,7 +38,8 @@ export default {
     computed: mapState([
         'curComponent',
         'componentData',
-        'curComponentList'
+        'curComponentList',
+        'scale'
     ]),
     mounted() {
         // 监听元素移动和不移动的事件
@@ -87,9 +88,13 @@ export default {
                  this.$store.commit("setOpenSelectMoreStatus",1)
                  // eventBus.$emit('openCustomRectangle');
              }
-             
+
              if (e.ctrlKey && e.keyCode == cKey) {
                  this.$store.commit('copy')
+             }else if (e.altKey  && e.key == 'q') {
+                 //编辑器放大和缩小
+                 let scale = this.scale==1?2:1;
+                 this.$store.commit('setEditScale',scale)
              } else if (e.ctrlKey  && e.keyCode == vKey) {
                  this.$store.commit('paste')
              } else if (e.ctrlKey  && e.keyCode == xKey) {
@@ -158,7 +163,7 @@ export default {
                  // eventBus.$emit('closeCustomRectangle');
                  this.$store.commit("setOpenCustomRectangleStatus",0)
              }
-             
+
              if(e.keyCode == ctrlKey){
                  this.$store.commit("setOpenSelectMoreStatus",0)
                  // eventBus.$emit('openCustomRectangle');
@@ -169,10 +174,10 @@ export default {
                  },400)
              }
           });
+
       })
     },
     methods: {
-
         deselectCurComponent(e) {
                 console.log("markline.vue deselectCurComponent",e);
                 // document.querySelector('#mark-line').focus()
